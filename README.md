@@ -1,54 +1,36 @@
 # Studia
 
-Studia adalah dashboard akademik berbasis Flask untuk mengelola tugas kuliah,
-deadline, agenda, waktu fokus, dan panduan belajar dengan Gemini AI.
+Dashboard akademik untuk mengatur tugas kuliah, tenggat waktu, agenda, dan sesi
+belajar. Studia berjalan seluruhnya di browser; data tugas dan preferensi disimpan
+di local storage masing-masing pengguna.
+
+## Buka Studia
+
+Website publik: **https://bilpbl23.github.io/studia/**
+
+GitHub Pages diperbarui otomatis setiap ada perubahan pada branch `main`. Jika
+website baru saja diaktifkan, tunggu workflow **Deploy Studia to GitHub Pages**
+selesai di tab **Actions**.
 
 ## Fitur
 
-- Dashboard progres, kalender, agenda deadline, dan mata kuliah.
-- Pengelolaan tugas dengan prioritas, filter, pengurutan, dan ekspor CSV.
-- Focus Timer Pomodoro dengan jeda dan riwayat sesi lokal.
-- Notifikasi popup, toast, dan efek suara yang dapat diatur.
-- Studia AI Guide menggunakan Gemini; API key disimpan di environment server,
-  bukan di source code atau browser.
+- Dashboard progres dengan ringkasan tugas, aktivitas tenggat, dan grafik.
+- Kalender, agenda per tanggal, dan daftar mata kuliah.
+- Tambah, edit, hapus, cari, filter, urutkan, dan ekspor tugas ke CSV.
+- Focus Timer Pomodoro dengan sesi istirahat dan riwayat waktu fokus.
+- Pengingat popup, toast, serta efek suara yang bisa dinyalakan atau dimatikan.
+- Layout responsif untuk layar komputer dan ponsel.
 
-## Menjalankan di Windows
+## Jalankan secara lokal (opsional)
 
-Python 3.10 atau lebih baru disarankan.
+Python 3.10 atau lebih baru:
 
 ```powershell
 py -3 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
-```
-
-Gemini AI bersifat opsional. Untuk mengaktifkannya, buat API key melalui
-[Google AI Studio](https://aistudio.google.com/app/apikey), lalu atur key hanya
-di terminal yang akan menjalankan aplikasi:
-
-```powershell
-$env:GEMINI_API_KEY="API_KEY_KAMU"
-```
-
-Jangan masukkan API key ke source code atau commit ke GitHub.
-
-Jalankan aplikasi:
-
-```powershell
-$env:STUDIA_PORT="5001"
 python studia.py
 ```
 
-Buka `http://127.0.0.1:5001` di browser. Jika `STUDIA_PORT` tidak diatur,
-aplikasi memakai port `5001`.
-
-## Catatan
-
-Data tugas dan pengaturan browser disimpan di local storage browser pengguna.
-Endpoint Gemini berjalan melalui server Flask. Jangan publikasikan API key,
-data tugas pribadi, file `.env`, atau kredensial lain.
-
-Repository GitHub publik membagikan **kode sumber**, bukan menjalankan aplikasi
-sebagai website publik. GitHub Pages tidak menjalankan aplikasi Flask; untuk
-membuka Studia sebagai website, deploy ke layanan hosting yang mendukung Flask
-dan atur `GEMINI_API_KEY` sebagai secret/environment variable di layanan itu.
+Buka URL lokal yang ditampilkan di terminal. Website GitHub Pages tidak
+memerlukan Python, instalasi, atau akun GitHub untuk digunakan.
