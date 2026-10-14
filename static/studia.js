@@ -22,6 +22,7 @@ let onboardingState={version:ONBOARDING_VERSION,introSeen:false,tourCompleted:fa
 let tourIndex=0;
 let tourTarget=null;
 let tourReturnFocus=null;
+let taskReturnFocus=null;
 let focusTimer={duration:25*60,remaining:25*60,endAt:null,taskId:"",mode:"focus",sessionId:null};
 let focusSessions=[];
 let timerInterval=null;
@@ -31,11 +32,11 @@ const $=id=>document.getElementById(id);
 const months=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 const guidedTourSteps=[
  {title:"Kenali dashboard",description:"Ringkasan ini menghubungkan status tugas, prioritas berikutnya, dan tenggat. Angka hanya berasal dari data yang tersimpan di browser ini.",view:"dashboard",target:".stats"},
- {title:"Kelola tugas",description:"Buka My Tasks untuk membuat atau mengedit tugas. Isi nama, mata kuliah, dan deadline; simpan agar tugas masuk ke kalender dan prioritas.",view:"tasks",target:"#view-tasks .heading"},
- {title:"Atur jadwal",description:"Schedule menempatkan tugas pada tanggal deadline. Pilih tanggal di kalender untuk melihat agenda hari itu.",view:"schedule",target:"#view-schedule .calendar"},
- {title:"Pantau progres",description:"Monitoring menghitung total tugas, penyelesaian, tenggat terlewat, dan estimasi waktu dari status aktual.",view:"monitoring",target:"#view-monitoring .stats"},
- {title:"Pengingat deadline",description:"Pengingat menampilkan deadline di dalam aplikasi—bukan chat dan tidak berjalan saat aplikasi ditutup.",view:"messages",target:"#view-messages .heading"},
- {title:"Mulai sekarang",description:"Buat tugas pertamamu dari tombol ini. Tambahkan mata kuliah dan deadline agar tugas langsung muncul pada ringkasan serta kalender.",view:"dashboard",target:"#view-dashboard .heading .btn.primary"}
+ {title:"Kelola tugas",description:"Buka Tugas Saya untuk membuat atau mengedit tugas. Isi nama, mata kuliah, dan tenggat; simpan agar tugas masuk ke kalender dan prioritas.",view:"tasks",target:"#view-tasks .heading"},
+ {title:"Atur jadwal",description:"Jadwal menempatkan tugas pada tanggal tenggat. Pilih tanggal di kalender untuk melihat agenda hari itu.",view:"schedule",target:"#view-schedule .calendar"},
+ {title:"Pantau progres",description:"Progres menghitung total tugas, penyelesaian, tenggat terlewat, dan estimasi waktu dari status aktual.",view:"monitoring",target:"#view-monitoring .stats"},
+ {title:"Pengingat tenggat",description:"Pengingat menampilkan tenggat di dalam aplikasi—bukan chat dan tidak berjalan saat aplikasi ditutup.",view:"messages",target:"#view-messages .heading"},
+ {title:"Mulai sekarang",description:"Buat tugas pertamamu dari tombol ini. Tambahkan mata kuliah dan tenggat agar tugas langsung muncul pada ringkasan serta kalender.",view:"dashboard",target:"#view-dashboard .heading .btn.primary"}
 ];
 
 function loadOnboarding(){
@@ -136,8 +137,8 @@ function renderOnboarding(){
  const hasDeadline=userTasks.some(task=>validTimestamp(task.deadline));
  const items=[
   {label:"Buat tugas pertamamu",done:hasTask,action:"task",button:"Tambah tugas"},
-  {label:"Tambahkan deadline ke tugas",done:hasDeadline,action:"task",button:"Atur deadline"},
-  {label:"Lihat deadline di kalender",done:onboardingState.scheduleVisited,action:"schedule",button:"Buka Schedule"},
+  {label:"Tambahkan tenggat ke tugas",done:hasDeadline,action:"task",button:"Atur tenggat"},
+  {label:"Lihat tenggat di kalender",done:onboardingState.scheduleVisited,action:"schedule",button:"Buka jadwal"},
   {label:"Selesaikan tur panduan",done:onboardingState.tourCompleted,action:"tour",button:"Mulai tur"}
  ];
  const complete=items.every(item=>item.done);
@@ -166,6 +167,7 @@ function formatFullDate(date){
  return date.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
 }
 function calendarOffset(date){return (date.getDay()+6)%7}
+function importanceLabel(value){return {high:"Tinggi",medium:"Sedang",low:"Rendah"}[value]||"Sedang"}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function validTimestamp(value){return typeof value==="string"&&Number.isFinite(Date.parse(value))}
 function normalizeTask(task){
@@ -255,7 +257,7 @@ function loadFocusData(){
  }catch(e){
   if(!storageBlocked){
    storageBlocked=true;let raw=null;try{raw=localStorage.getItem(TIMER_KEY)}catch{}
-   setStorageNotice("Pengaturan Focus Timer tidak dapat dibaca. Unduh salinan sebelum memilih mulai baru.",raw);
+   setStorageNotice("Pengaturan Timer Fokus tidak dapat dibaca. Unduh salinan sebelum memilih mulai baru.",raw);
   }
   console.error("Could not restore focus timer",e);
  }
@@ -268,7 +270,7 @@ function loadFocusData(){
  }catch(e){
   if(!storageBlocked){
    storageBlocked=true;let raw=null;try{raw=localStorage.getItem(STUDY_KEY)}catch{}
-   setStorageNotice("Riwayat Focus Timer tidak dapat dibaca. Unduh salinan sebelum memilih mulai baru.",raw);
+   setStorageNotice("Riwayat Timer Fokus tidak dapat dibaca. Unduh salinan sebelum memilih mulai baru.",raw);
   }
   console.error("Could not restore focus history",e);
  }
@@ -277,7 +279,7 @@ function saveFocusData(){
  if(storageBlocked)return false;
  return persistLocalStorage({
   [TIMER_KEY]:JSON.stringify(focusTimer),[STUDY_KEY]:JSON.stringify(focusSessions.slice(-500))
- },"Focus Timer data");
+ },"Timer Fokus");
 }
 function renderFocusTimer(){
  const total=focusTimer.duration,remaining=Math.max(0,focusTimer.remaining);
@@ -462,7 +464,7 @@ function fmtShort(v){
 }
 function reason(t){
  const h=(new Date(t.deadline)-Date.now())/3600000;
- const due=h<0?"deadline sudah terlewat":h<=24?"deadline dalam "+Math.max(1,Math.ceil(h))+" jam":h<=48?"deadline besok":h<=168?"deadline dalam "+Math.ceil(h/24)+" hari":"deadline masih "+Math.ceil(h/24)+" hari lagi";
+ const due=h<0?"tenggat sudah terlewat":h<=24?"tenggat dalam "+Math.max(1,Math.ceil(h))+" jam":h<=48?"tenggat besok":h<=168?"tenggat dalam "+Math.ceil(h/24)+" hari":"tenggat masih "+Math.ceil(h/24)+" hari lagi";
  const importance={high:"kepentingan tinggi",medium:"kepentingan sedang",low:"kepentingan rendah"}[t.importance];
  return "Disarankan dikerjakan "+(h<0?"segera":"lebih dahulu")+" karena "+due+", estimasi "+t.duration+" menit, dan "+importance+".";
 }
@@ -493,6 +495,7 @@ function removeTask(id){
 }
 function openTask(t=null){
  if(storageBlocked){showToast("Perubahan diblokir agar data yang tidak terbaca tidak tertimpa.","warning");return}
+ if(!$("taskModal").classList.contains("open"))taskReturnFocus=document.activeElement;
  $("taskForm").reset();$("formError").textContent="";$("taskId").value=t?t.id:"";
  $("formTitle").textContent=t?"Edit Tugas":"Tambah Tugas";
  if(t){
@@ -504,7 +507,14 @@ function openTask(t=null){
  }
  $("taskModal").classList.add("open");$("title").focus();
 }
-function closeTask(){$("taskModal").classList.remove("open")}
+function closeTask(){
+ if(!$("taskModal").classList.contains("open"))return;
+ $("taskModal").classList.remove("open");
+ const target=taskReturnFocus instanceof HTMLElement&&taskReturnFocus.isConnected?
+  taskReturnFocus:document.querySelector(".view.active h1");
+ if(target){target.tabIndex=-1;target.focus()}
+ taskReturnFocus=null;
+}
 function editTask(id){const t=tasks.find(x=>x.id===id);if(t)openTask(t)}
 $("taskForm").addEventListener("submit",e=>{
  e.preventDefault();
@@ -512,7 +522,7 @@ $("taskForm").addEventListener("submit",e=>{
  const deadline=$("deadline").value,importance=$("importance").value;
  const duration=Number($("duration").value),description=$("description").value.trim();
  if(!title||!subject||!deadline||isNaN(new Date(deadline).getTime())||!Number.isFinite(duration)||duration<1||duration>10080){
-  $("formError").textContent="Periksa kembali nama tugas, mata kuliah, deadline, dan durasi.";return;
+  $("formError").textContent="Periksa kembali nama tugas, mata kuliah, tenggat, dan durasi.";return;
  }
  const old=tasks.find(t=>t.id===id);
  const now=new Date().toISOString();
@@ -529,7 +539,7 @@ function taskCard(t){
  return `<article class="task-row ${t.done?"done":""}">
  <div class="task-row-top"><div class="task-row-info">
  <div class="task-row-title">${esc(t.title)} ${t.isSample?'<span class="pill gray">DATA DEMO</span>':""}</div>
- <div class="task-row-meta">${esc(t.subject)}<br>Deadline: ${esc(fmt(t.deadline))}<br>Durasi: ${esc(t.duration)} menit · Kepentingan: ${esc(t.importance)}${t.description?"<br>"+esc(t.description):""}</div>
+ <div class="task-row-meta">${esc(t.subject)}<br>Tenggat: ${esc(fmt(t.deadline))}<br>Durasi: ${esc(t.duration)} menit · Kepentingan: ${esc(importanceLabel(t.importance))}${t.description?"<br>"+esc(t.description):""}</div>
  </div><span class="pill ${b[1]}">${b[0]}</span></div>
  <div class="task-row-actions"><button class="btn small" onclick="toggleDone('${t.id}')">${t.done?"Buka kembali":"✓ Selesai"}</button><button class="btn small" onclick="editTask('${t.id}')">Edit</button><button class="btn small" onclick="removeTask('${t.id}')">Hapus</button></div></article>`;
 }
@@ -549,7 +559,7 @@ function exportTasks(){
   if(/^[\s]*[=+\-@]/.test(text))text="'"+text;
   return '"'+text.replace(/"/g,'""')+'"';
  };
- const rows=[["Nama tugas","Mata kuliah","Deadline","Prioritas","Durasi (menit)","Status","Sumber","Catatan"],
+ const rows=[["Nama tugas","Mata kuliah","Tenggat","Prioritas","Durasi (menit)","Status","Sumber","Catatan"],
   ...sorted().map(task=>[task.title,task.subject,fmt(task.deadline),task.importance,task.duration,task.done?"Selesai":isLate(task)?"Terlambat":"Aktif",task.isSample?"Data Demo":"Pribadi",task.description||""])];
  const csv="\uFEFF"+rows.map(row=>row.map(quote).join(",")).join("\r\n");
  const url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
@@ -670,12 +680,12 @@ function renderDashboard(){
  $("doneProgress").style.width=rate+"%";
  const mins=pending.reduce((s,t)=>s+(Number(t.duration)||0),0);
  $("totalTime").textContent=(mins/60).toLocaleString("id-ID",{maximumFractionDigits:1})+" jam";
- $("studyInsight").textContent=late.length?late.length+" tugas telah melewati deadline. Evaluasi prioritasmu.":pending.length?"Terus kerjakan tugas secara konsisten.":"Semua tugas sudah selesai!";
+ $("studyInsight").textContent=late.length?late.length+" tugas telah melewati tenggat. Evaluasi prioritasmu.":pending.length?"Terus kerjakan tugas secara konsisten.":"Semua tugas sudah selesai!";
  renderTodayBrief(pending,late);
  const focus=sorted().find(t=>!t.done);
- $("focusContent").innerHTML=focus?`<span class="pill">REKOMENDASI UTAMA</span>${focus.isSample?'<span class="pill gray">DATA DEMO</span>':""}<div class="focus-title">${esc(focus.title)}</div><div class="muted">${esc(focus.subject)}</div><div class="sub">Deadline: ${esc(fmt(focus.deadline))}<br>Estimasi: ${esc(focus.duration)} menit</div><div class="reason">${esc(reason(focus))}</div><button class="btn primary" onclick="$('timerTask').value='${focus.id}';startOrPauseFocus()">Mulai sesi fokus</button> <button class="btn" onclick="editTask('${focus.id}')">Edit tugas</button>`:'<div class="empty">Belum ada tugas aktif. Tambahkan tugas atau muat data demo untuk melihat Studia beraksi.</div><button class="btn primary small" onclick="openTask()">＋ Tambah tugas</button> <button class="btn small" onclick="loadDemoData()">Muat Data Demo</button>';
+ $("focusContent").innerHTML=focus?`<span class="pill">REKOMENDASI UTAMA</span>${focus.isSample?'<span class="pill gray">DATA DEMO</span>':""}<div class="focus-title">${esc(focus.title)}</div><div class="muted">${esc(focus.subject)}</div><div class="sub">Tenggat: ${esc(fmt(focus.deadline))}<br>Estimasi: ${esc(focus.duration)} menit</div><div class="reason">${esc(reason(focus))}</div><button class="btn primary" onclick="$('timerTask').value='${focus.id}';startOrPauseFocus()">Mulai sesi fokus</button> <button class="btn" onclick="editTask('${focus.id}')">Edit tugas</button>`:'<div class="empty">Belum ada tugas aktif. Tambahkan tugas atau muat data demo untuk melihat Studia beraksi.</div><button class="btn primary small" onclick="openTask()">＋ Tambah tugas</button> <button class="btn small" onclick="loadDemoData()">Muat Data Demo</button>';
  const recent=sorted().filter(t=>!t.done).slice(0,4);
- $("assignmentList").innerHTML=recent.length?recent.map(t=>{const b=badge(t);return `<div class="assignment"><div><div class="assignment-name">${esc(t.title)} ${t.isSample?'<span class="pill gray">DEMO</span>':""}</div><div class="assignment-sub">${esc(t.subject)}</div></div><div class="assignment-date">${esc(fmtShort(t.deadline))}</div><span class="pill ${b[1]}">${b[0]}</span></div>`}).join(""):'<div class="empty">Belum ada tugas aktif.</div>';
+ $("assignmentList").innerHTML=recent.length?recent.map(t=>{const b=badge(t);return `<div class="assignment"><div><div class="assignment-name">${esc(t.title)} ${t.isSample?'<span class="pill gray">DATA DEMO</span>':""}</div><div class="assignment-sub">${esc(t.subject)}</div></div><div class="assignment-date">${esc(fmtShort(t.deadline))}</div><span class="pill ${b[1]}">${b[0]}</span></div>`}).join(""):'<div class="empty">Belum ada tugas aktif.</div>';
  renderCompletionHistory();
  renderActivity();
 }
@@ -691,10 +701,10 @@ function renderTodayBrief(pending,late){
   `<button class="today-item" onclick="editTask('${task.id}')"><span>${esc(task.title)}</span><span class="pill">${esc(new Date(task.deadline).toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"}))}</span></button>`
  ).join(""):'<div class="empty">Waktunya bisa digunakan untuk mulai lebih awal atau beristirahat.</div>';
  $("nextDeadlineIntro").textContent=late.length?
-  late.length+" tugas terlambat; periksa prioritas dan atur ulang rencanamu tanpa mengubah deadline otomatis.":
-  next.length?"Deadline terdekat diurutkan berdasarkan prioritas dan waktu.":"Tidak ada tugas aktif.";
+  late.length+" tugas terlambat; periksa prioritas dan atur ulang rencanamu tanpa mengubah tenggat otomatis.":
+  next.length?"Tenggat terdekat diurutkan berdasarkan prioritas dan waktu.":"Tidak ada tugas aktif.";
  $("nextDeadlineList").innerHTML=next.length?next.map(task=>
-  `<button class="today-item" onclick="editTask('${task.id}')"><span>${esc(task.title)} ${task.isSample?'<span class="pill gray">DEMO</span>':""}</span><span class="pill ${isLate(task)?"red":""}">${esc(isLate(task)?"Terlambat · "+fmtShort(task.deadline):fmtShort(task.deadline))}</span></button>`
+  `<button class="today-item" onclick="editTask('${task.id}')"><span>${esc(task.title)} ${task.isSample?'<span class="pill gray">DATA DEMO</span>':""}</span><span class="pill ${isLate(task)?"red":""}">${esc(isLate(task)?"Terlambat · "+fmtShort(task.deadline):fmtShort(task.deadline))}</span></button>`
  ).join(""):'<div class="empty">Tambahkan tugas untuk melihat prioritas berikutnya.</div>';
 }
 function renderCompletionHistory(){
@@ -729,26 +739,35 @@ function renderActivity(){
   const key=dayKey(date),count=dueCounts.get(key)||0;
   total+=count;
   const level=count>=4?4:count>=3?3:count>=2?2:count?1:0;
-  const label=date.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long"});
-  return `<button class="heat-cell level-${level}" onclick="selectDate('${key}')" title="${esc(label)} · ${count} deadline${count===1?"":"s"}" aria-label="${esc(label)}: ${count} deadline${count===1?"":"s"}"></button>`;
+  const label=formatFullDate(date);
+  return `<button class="heat-cell level-${level}" onclick="selectDate('${key}')" title="${esc(label)} · ${count} tenggat" aria-label="${esc(label)}: ${count} tenggat"></button>`;
  }).join("");
- $("activitySummary").textContent=total+" deadline tercatat";
+ $("activitySummary").textContent=total+" tenggat tercatat";
 }
 function renderCalendar(){
  [1,2].forEach(n=>{
   const label=$("monthLabel"+(n===1?"":"2")),grid=$("calendarDays"+(n===1?"":"2"));
   label.textContent=months[shownMonth.getMonth()]+" "+shownMonth.getFullYear();
-  const first=new Date(shownMonth.getFullYear(),shownMonth.getMonth(),1);
+  const first=new Date(shownMonth.getFullYear(),shownMonth.getMonth(),1),currentDay=dayKey(new Date());
   const count=new Date(shownMonth.getFullYear(),shownMonth.getMonth()+1,0).getDate();
   let html="";
   for(let i=0;i<calendarOffset(first);i++)html+='<span aria-hidden="true"></span>';
   for(let d=1;d<=count;d++){
    const date=new Date(shownMonth.getFullYear(),shownMonth.getMonth(),d);
-   const key=dayKey(date),today=key===dayKey(new Date()),selected=key===dayKey(selectedDate);
-   const due=tasks.filter(task=>taskDayKey(task)===key),pending=due.filter(task=>!task.done).length;
-   const completed=due.length-pending,label=formatFullDate(date);
-   const status=due.length?`${due.length} deadline, ${pending} belum selesai, ${completed} selesai`:"tidak ada deadline";
-   html+=`<button type="button" class="day ${today?"today":""} ${selected?"selected":""} ${due.length?"event":""} ${due.length&&!pending?"completed-event":""}" onclick="selectDate('${key}')" aria-label="${esc(label)}, ${status}" title="${esc(label)} · ${status}" ${today?'aria-current="date"':""}>${d}</button>`;
+   const key=dayKey(date),today=key===currentDay,selected=key===dayKey(selectedDate),dayLabel=formatFullDate(date);
+   const due=tasks.filter(task=>taskDayKey(task)===key),pending=due.filter(task=>!task.done);
+   const overdueCount=pending.filter(isLate).length;
+   const todayCount=key===currentDay?pending.length-overdueCount:0;
+   const upcomingCount=key>currentDay?pending.length:0;
+   const completedCount=due.length-pending.length;
+   const statusParts=[];
+   if(overdueCount)statusParts.push(`${overdueCount} terlambat`);
+   if(todayCount)statusParts.push(`${todayCount} hari ini`);
+   if(upcomingCount)statusParts.push(`${upcomingCount} mendatang`);
+   if(completedCount)statusParts.push(`${completedCount} selesai`);
+   const status=due.length?statusParts.join(", "):"tidak ada tenggat";
+   const stateClass=overdueCount?"overdue-event":todayCount?"today-event":upcomingCount?"upcoming-event":completedCount?"completed-event":"";
+   html+=`<button type="button" class="day ${today?"today":""} ${selected?"selected":""} ${due.length?"event":""} ${stateClass}" onclick="selectDate('${key}')" aria-label="${esc(dayLabel)}, ${status}" aria-pressed="${selected}" title="${esc(dayLabel)} · ${status}" ${today?'aria-current="date"':""}>${d}</button>`;
   }
   grid.innerHTML=html;
  });
@@ -765,12 +784,16 @@ function selectDate(key){
  selectedDate=new Date(y,m-1,d);shownMonth=new Date(y,m-1,1);
  renderCalendar();
 }
+function addTaskForSelectedDate(){
+ openTask();
+ $("deadline").value=localDate(new Date(selectedDate.getFullYear(),selectedDate.getMonth(),selectedDate.getDate(),9));
+}
 function renderAgenda(){
  const key=dayKey(selectedDate);
  const list=tasks.filter(task=>taskDayKey(task)===key).sort((a,b)=>new Date(a.deadline)-new Date(b.deadline));
  const title=formatFullDate(selectedDate);
  $("agendaTitle").textContent="Agenda";$("agendaSub").textContent=title;
- const html=list.length?list.map(t=>{const state=badge(t);return `<div class="agenda-item"><input class="check" type="checkbox" ${t.done?"checked":""} onchange="toggleDone('${t.id}')" aria-label="Tandai selesai"><div class="agenda-content"><div class="agenda-title">${esc(t.title)} ${t.isSample?'<span class="pill gray">DEMO</span>':""}</div><div class="agenda-meta">${esc(t.subject)} · ${esc(t.importance)} · ${state[0]}${t.description?"<br>"+esc(t.description):""}</div></div><div class="agenda-time">${esc(new Date(t.deadline).toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"}))}</div></div>`}).join(""):'<div class="empty">Belum ada tenggat pada tanggal ini. Pilih tanggal bertanda titik untuk melihat agenda.</div>';
+ const html=list.length?list.map(t=>{const state=badge(t);return `<div class="agenda-item"><input class="check" type="checkbox" ${t.done?"checked":""} onchange="toggleDone('${t.id}')" aria-label="${t.done?"Buka kembali":"Tandai selesai"}: ${esc(t.title)}"><div class="agenda-content"><div class="agenda-title">${esc(t.title)} ${t.isSample?'<span class="pill gray">DATA DEMO</span>':""}</div><div class="agenda-meta">${esc(formatFullDate(new Date(t.deadline)))}<br>${esc(t.subject)} · Kepentingan ${esc(importanceLabel(t.importance))} · ${state[0]}${t.description?"<br>"+esc(t.description):""}</div></div><div class="agenda-time">${esc(new Date(t.deadline).toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"}))}</div></div>`}).join(""):`<div class="empty agenda-empty"><p>Belum ada tugas untuk ${esc(title)}.</p><span class="sub">Tambahkan tenggat untuk menampilkan agenda pada tanggal ini.</span><button class="btn small" onclick="addTaskForSelectedDate()">＋ Tambah tugas pada tanggal ini</button></div>`;
  $("agendaList").innerHTML=html;
  $("scheduleDateTitle").textContent=title;$("scheduleList").innerHTML=html;
 }
@@ -779,17 +802,17 @@ function renderMonitoring(){
  const rate=tasks.length?Math.round(done.length/tasks.length*100):0;
  $("mTotal").textContent=tasks.length;$("mRate").textContent=rate+"%";
  $("mLate").textContent=late.length;
- $("mHours").textContent=(pending.reduce((s,t)=>s+(Number(t.duration)||0),0)/60).toLocaleString("id-ID",{maximumFractionDigits:1})+"h";
+ $("mHours").textContent=(pending.reduce((s,t)=>s+(Number(t.duration)||0),0)/60).toLocaleString("id-ID",{maximumFractionDigits:1})+" jam";
  const groups=[["Selesai",done.length],["Belum selesai",pending.length],["Terlambat",late.length]];
  $("monitorBars").innerHTML=groups.map(([name,n])=>`<div class="metric-row"><span>${name}</span><strong>${n}</strong></div><div class="progress" style="margin-bottom:16px"><div style="width:${tasks.length?n/tasks.length*100:0}%"></div></div>`).join("");
 }
 function renderMessages(){
  const pending=tasks.filter(t=>!t.done);
  const messages=[];
- pending.filter(isLate).forEach(t=>messages.push(["Deadline terlewat",t.title+" — "+t.subject,"red"]));
- pending.filter(t=>!isLate(t)&&(new Date(t.deadline)-Date.now())<=86400000).forEach(t=>messages.push(["Deadline mendekat",t.title+" — "+fmt(t.deadline),"yellow"]));
+ pending.filter(isLate).forEach(t=>messages.push(["Tenggat terlewat",t.title+" — "+t.subject,"red"]));
+ pending.filter(t=>!isLate(t)&&(new Date(t.deadline)-Date.now())<=86400000).forEach(t=>messages.push(["Tenggat mendekat",t.title+" — "+fmt(t.deadline),"yellow"]));
  const actionable=messages.length;
- if(!actionable)messages.push(["Semua terkendali","Tidak ada peringatan deadline berdasarkan tugas yang tersimpan.","green"]);
+ if(!actionable)messages.push(["Semua terkendali","Tidak ada peringatan tenggat berdasarkan tugas yang tersimpan.","green"]);
  const html=messages.map(m=>`<div class="agenda-item"><span class="pill ${m[2]}">●</span><div class="agenda-content"><div class="agenda-title">${esc(m[0])}</div><div class="agenda-meta">${esc(m[1])}</div></div></div>`).join("");
  $("messageList").innerHTML=html;
  $("notificationList").innerHTML=html;
@@ -797,9 +820,15 @@ function renderMessages(){
 }
 function openNotifications(){
  renderMessages();$("notificationModal").classList.add("open");
+ $("notificationBtn").setAttribute("aria-expanded","true");
  $("closeNotificationsBtn").focus();
 }
-function closeNotifications(){$("notificationModal").classList.remove("open")}
+function closeNotifications(){
+ if(!$("notificationModal").classList.contains("open"))return;
+ $("notificationModal").classList.remove("open");
+ $("notificationBtn").setAttribute("aria-expanded","false");
+ $("notificationBtn").focus();
+}
 function renderAll(){
  renderDashboard();renderTasks();renderCalendar();renderMonitoring();renderMessages();renderDemoControls();
  renderFocusTimer();
@@ -815,7 +844,7 @@ function navigate(view){
   if(current)button.setAttribute("aria-current","page");
   else button.removeAttribute("aria-current");
  });
- $("sidebar").classList.remove("open");
+ $("sidebar").classList.remove("open");$("menuBtn").setAttribute("aria-expanded","false");
  if(view==="tasks")renderTasks();
  if(view==="schedule"&&!onboardingState.scheduleVisited){
   onboardingState.scheduleVisited=true;saveOnboarding();renderOnboarding();
@@ -830,7 +859,10 @@ $("globalSearch").addEventListener("input",()=>{
  if($("globalSearch").value.trim())navigate("tasks");
  renderTasks();
 });
-$("menuBtn").onclick=()=>$("sidebar").classList.toggle("open");
+$("menuBtn").onclick=()=>{
+ const expanded=$("sidebar").classList.toggle("open");
+ $("menuBtn").setAttribute("aria-expanded",String(expanded));
+};
  $("sampleBtn").onclick=loadDemoData;
  $("removeDemoBtn").onclick=$("removeDemoBannerBtn").onclick=removeDemoData;
  $("exportTasksBtn").onclick=exportTasks;
@@ -884,6 +916,16 @@ $("menuBtn").onclick=()=>$("sidebar").classList.toggle("open");
    else if(event.key==="ArrowRight")advanceGuidedTour(1);
    else if(event.key==="ArrowLeft")advanceGuidedTour(-1);
    return;
+  }
+  const activeDialog=document.querySelector(".modal.open [role='dialog']");
+  if(activeDialog&&event.key==="Tab"){
+   const controls=[...activeDialog.querySelectorAll('button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),textarea:not([disabled]),[href],[tabindex]:not([tabindex="-1"])')]
+    .filter(element=>element.getClientRects().length>0);
+   if(controls.length){
+    const first=controls[0],last=controls[controls.length-1];
+    if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}
+    else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}
+   }
   }
   if(event.key==="Escape"){closeTask();closeNotifications()}
  });

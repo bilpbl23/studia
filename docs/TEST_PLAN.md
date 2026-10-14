@@ -1,50 +1,62 @@
 # Rencana dan Hasil Pengujian
 
-Status: **revisi navigasi, Data Demo, dan kalender diuji lokal pada 2026-10-14.**
+Status: **revisi status kalender, agenda, aksesibilitas, dan label UI diuji lokal
+pada 2026-10-14.**
 
-## Otomatis (Python `unittest`)
+## Otomatis
 
-`python -m unittest discover -s tests -v` — **10 tes lulus**.
+`python -m unittest discover -s tests -v` — **12 tes lulus**.
 
 | Skenario | Hasil |
 |---|---|
-| Route Flask, aset lokal, dan struktur output GitHub Pages | Lulus |
+| Route Flask, aset lokal, dan referensi output GitHub Pages | Lulus |
 | Penyimpanan lokal, riwayat aktual, dan payload cadangan | Lulus |
 | Intro, checklist, tur panduan, dan Tutorial permanen | Lulus |
 | Navigasi Classroom tidak ada; Pengingat tetap ada | Lulus |
-| Demo memakai key terpisah dan mekanisme muat/hapus yang mempertahankan tugas pribadi | Lulus |
-| Kalender berorientasi Senin, memakai tanggal lokal, dan format tanggal lengkap | Lulus |
+| Pemisahan Data Demo dan perlindungan tugas pribadi | Lulus |
+| Kalender Senin–Minggu, tanggal lokal, dan pemformatan tanggal | Lulus |
+| Penanda deadline mendatang, hari ini, terlambat, dan selesai | Lulus |
+| Agenda kosong, tanggal terpilih, aksesibilitas label, dan aksi tambah | Lulus |
+| Label Indonesia dan cakupan CSV/cadangan/pemulihan | Lulus |
 | Kontrol suara mandiri dihapus | Lulus |
 
-`py_compile` untuk aplikasi dan tes serta `git diff --check` juga lulus.
+Kompilasi `py_compile` untuk aplikasi dan tes serta `git diff --check` lulus.
+Analisis editor tidak melaporkan masalah pada `studia.py` maupun `studia.js`.
 
 ## Smoke test browser lokal
 
-- Tidak ada teks, tautan, atau navigasi Classroom pada UI; Pengingat tersedia.
-- Data uji tugas pribadi tetap di `studia_tasks_v1`. Memuat enam tugas demo
-  menyimpan data tersebut terpisah di `studia_demo_tasks_v1`; dashboard dan
-  Monitoring menghitung 7 total, 6 aktif, 1 selesai, 1 terlambat, 14% selesai.
-- Reload mempertahankan enam demo tanpa duplikasi. Migrasi satu contoh lama dari
-  penyimpanan utama memindahkannya ke key demo dan mempertahankan tugas pribadi.
-- Menghapus Data Demo menyisakan tugas pribadi identik, mengosongkan key demo,
-  dan tetap demikian setelah reload.
-- Statistik cocok dengan status dan deadline aktual; agenda yang dipilih
-  menampilkan tugas, nama hari/tanggal penuh, mata kuliah, prioritas, status,
-  keterangan, dan jam setempat.
-- Kalender diuji untuk Februari 2028 (29 hari), Februari 2027 (28), April 2026
-  (30), dan Mei 2026 (31); hari pertama berada di kolom yang benar dengan
-  pekan Senin–Minggu.
-- Tombol bulan maju/mundur memperbarui bulan dan tanggal pilihan. Penanda
-  deadline, tanggal hari ini, agenda kosong, serta detail agenda diuji.
-- Viewport 390px tidak mengalami horizontal overflow (dokumen 375px). CSS/JS v7
-  dimuat tanpa page error atau request gagal.
+Pengujian dilakukan pada instance lokal terisolasi di port 5004 menggunakan
+penyimpanan browser khusus untuk data QA.
 
-Data smoke test dibuat hanya pada origin lokal port 5003 dan dihapus setelah
-pengujian; tidak ada perubahan pada data browser live.
+- Dashboard menggabungkan lima tugas pribadi dan satu Data Demo dengan benar:
+  5 aktif, 1 selesai, 1 terlambat, dan 17% selesai. Data demo memiliki banner
+  serta key penyimpanan terpisah; pemuatan ulang tidak menggandakan tugas.
+- Kelas kalender serta label pembaca layar membedakan status mendatang, hari ini,
+  terlambat, dan selesai. Keempat warna penanda terhitung berbeda.
+- Pemilihan tanggal menampilkan dua tugas pada hari yang sama, nama hari dan
+  tanggal lengkap, waktu setempat, kepentingan, serta status.
+- Menandai tugas selesai memperbarui statistik dan agenda. Mengubah tenggat
+  memindahkan tugas ke tanggal baru; menghapus tugas menghapus hanya tugas itu.
+  Setelah muat ulang, data tersimpan konsisten.
+- Agenda kosong menyediakan tombol tambah tugas; formulir memakai tanggal
+  terpilih pukul 09.00 sebagai nilai awal.
+- Dialog tugas mengunci fokus keyboard, mendukung Escape, dan mengembalikan fokus.
+  Menu mobile mengumumkan statusnya melalui `aria-expanded`.
+- Kalender sesuai untuk Februari 2028 (29 hari), Februari 2027 (28), April 2026
+  (30), Mei 2026 (31), dan Desember 2026; setiap tanggal 1 berada pada kolom
+  hari yang tepat. Navigasi Desember 2026 ke Januari 2027 berfungsi.
+- Pada lebar 390px (dokumen 375px) dan 1440px (dokumen 1425px), tidak ada
+  overflow horizontal. Classroom tidak muncul. Tidak ada error JavaScript
+  ketika halaman dimuat ulang dan skenario utama dijalankan.
+- Menghapus Data Demo mempertahankan seluruh tugas pribadi dalam penyimpanan.
+  Data pengujian lokal dibersihkan setelah smoke test; data situs live tidak
+  disentuh.
 
 ## Deployment
 
-Status publish diverifikasi setelah push, bukan sebagai bagian dari pengujian
-lokal. Workflow GitHub Pages dan versi production perlu diperiksa untuk setiap
-commit baru. Repository tidak menunjukkan konfigurasi Vercel yang membuktikan
-deployment production terkait dengan proyek ini.
+Workflow `.github/workflows/pages.yml` menjalankan suite Python sebelum menyusun
+`_site/index.html` dari `studia.py` dan menyalin aset `static/`. Status publish
+untuk perubahan baru harus diverifikasi setelah push dan workflow selesai.
+
+Repository tidak menunjukkan konfigurasi Vercel yang membuktikan bahwa project
+production terkait dengan repository ini; deployment Vercel tidak diubah.

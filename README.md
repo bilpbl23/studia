@@ -15,28 +15,35 @@ selesai di tab **Actions**.
 ## Fitur
 
 - Dashboard progres dengan ringkasan tugas, aktivitas tenggat, dan grafik.
-- Kalender deadline Senin–Minggu dengan agenda tanggal, nama hari, status, dan
-  prioritas tugas.
+- Kalender tenggat Senin–Minggu dengan penanda tugas mendatang, hari ini,
+  terlambat, dan selesai; agenda memuat nama hari, tanggal, waktu, status, serta
+  prioritas tugas. Agenda kosong menyediakan aksi untuk menambah tugas pada
+  tanggal pilihan.
 - Tambah, edit, hapus, cari, filter, urutkan, dan ekspor tugas ke CSV.
 - Cadangan dan pemulihan data lokal dalam format JSON.
-- Focus Timer Pomodoro dengan sesi istirahat, riwayat, dan atribusi tugas.
+- Timer Fokus dengan sesi istirahat, riwayat, dan atribusi tugas.
 - Grafik penyelesaian berbasis riwayat perubahan status yang benar-benar tercatat.
-- Intro first-run yang dapat dilewati, tur interaktif, checklist langkah awal, dan
+- Intro kunjungan pertama yang dapat dilewati, tur interaktif, daftar langkah awal, dan
   Tutorial permanen.
-- Pengingat deadline di dalam aplikasi saat halaman dibuka dan toast status.
-- Layout responsif untuk layar komputer dan ponsel.
+- Pengingat tenggat di dalam aplikasi saat halaman dibuka dan pemberitahuan status.
+- Tampilan responsif untuk layar komputer dan ponsel.
 - Data Demo akademik yang ditandai jelas, tersimpan terpisah, dan dapat dihapus
   tanpa mengubah tugas pribadi.
 
 Riwayat aktivitas baru mulai direkam setelah versi yang mendukungnya digunakan.
 Tugas lama tetap dimuat, tetapi tidak dipakai untuk merekonstruksi grafik historis.
-Pengingat bukan browser notification dan tidak berjalan saat website ditutup.
+Pengingat bukan notifikasi peramban dan tidak berjalan saat website ditutup.
 Tugas demo tidak dicampur ke penyimpanan tugas pribadi; ekspor cadangan hanya
 memuat data pribadi, sementara CSV menandai sumber setiap tugas.
 Untuk presentasi, pilih **Muat Data Demo** dari sidebar atau Tutorial; saat aktif,
 banner Data Demo menyediakan **Hapus Data Demo** tanpa mengubah tugas pribadi.
-Sound effect berdiri sendiri telah dihapus. Intro berlangsung setelah pengguna
-membuka Studia, tanpa autoplay audio.
+Data kalender, statistik, prioritas, agenda, dan tugas demo memakai sumber yang
+sama. **Unduh Daftar Tugas** membuat CSV dari seluruh daftar (dengan kolom sumber),
+sedangkan **Simpan Salinan Data** hanya memuat tugas pribadi. **Pulihkan dari File
+Cadangan** mengganti tugas pribadi dan riwayat, tetapi mempertahankan Data Demo;
+aplikasi meminta konfirmasi sebelum mengganti data.
+Efek suara yang berdiri sendiri telah dihapus. Intro berlangsung setelah pengguna
+membuka Studia, tanpa memutar audio secara otomatis.
 
 ## Pengembangan dan pemeriksaan
 

@@ -1,6 +1,19 @@
 # Changelog
 
-## 2026-10-14 — Data demo aman dan kalender deadline
+## 2026-10-14 — Status kalender, aksesibilitas, dan label UI
+
+- Membedakan penanda kalender untuk tenggat mendatang, hari ini, terlambat, dan
+  selesai, serta menyertakan status tugas pada label aksesibel setiap tanggal.
+- Menyediakan aksi tambah tugas dari agenda kosong dengan tanggal yang dipilih
+  sebagai tenggat awal; agenda menampilkan hari/tanggal lengkap, waktu, status,
+  dan kepentingan dalam bahasa Indonesia.
+- Memperjelas cakupan unduh CSV, cadangan, dan pemulihan agar pengguna tahu
+  Data Demo tetap terpisah dari data pribadinya.
+- Melokalkan label utama, panduan onboarding, dan tanggal kalender; menambahkan
+  pengelolaan fokus keyboard dan atribut state untuk dialog, menu mobile, dan
+  tombol tanggal.
+
+## 2026-10-14 — Data demo aman dan kalender tenggat
 
 - Menghapus Classroom dari navigasi, halaman, dan tutorial tanpa mengubah fitur
   Pengingat.

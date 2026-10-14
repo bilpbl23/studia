@@ -168,15 +168,20 @@ h3{font-size:14px;margin:0}
 .day{position:relative;aspect-ratio:1;border:0;border-radius:8px;background:transparent;
  color:#e5deef;font-size:11px}
 .day:hover{background:#4b435c}
+.day:focus-visible{outline:2px solid var(--purple);outline-offset:1px}
 .day.selected{background:var(--purple);color:#21172f;font-weight:850}
 .day.today:not(.selected){border:1px solid var(--purple)}
 .day.event:after{content:"";position:absolute;bottom:4px;left:calc(50% - 2px);
  width:4px;height:4px;border-radius:50%;background:var(--green)}
+.day.upcoming-event:after{background:var(--green)}
+.day.today-event:after{background:var(--yellow)}
+.day.overdue-event:after{background:var(--red)}
 .day.completed-event:after{background:#a9a2bb}
-.day.selected.event:after{background:#21172f}
-.calendar-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;color:var(--muted);font-size:10px}
+.calendar-legend{display:flex;flex-wrap:wrap;gap:10px 14px;margin-top:12px;color:var(--muted);font-size:10px}
 .calendar-legend span{display:flex;align-items:center;gap:6px}
 .calendar-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.calendar-dot.due-today{background:var(--yellow)}
+.calendar-dot.overdue{background:var(--red)}
 .calendar-dot.completed{background:#a9a2bb}
 .agenda{margin-top:21px}
 .agenda-item{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
@@ -186,6 +191,8 @@ h3{font-size:14px;margin:0}
 .agenda-title{font-size:12px;font-weight:700;overflow-wrap:anywhere}
 .agenda-meta{font-size:10px;color:var(--muted);margin-top:5px;line-height:1.6}
 .agenda-time{font-size:10px;color:#c8bddb;white-space:nowrap}
+.agenda-empty p{margin:0;color:var(--text)}
+.agenda-empty .sub{display:block;margin:3px 0 12px}
 .section-tools{display:flex;gap:8px;margin-bottom:14px}
 .section-tools input{flex:1}
 .section-tools select{width:auto;max-width:150px}
@@ -305,6 +312,10 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:24px 0}
  .heading{align-items:flex-start;flex-direction:column}
  .right-stack{grid-template-columns:1fr}
  .today-brief{grid-template-columns:1fr}
+ .section-tools{flex-wrap:wrap}
+ .section-tools input{flex:1 1 220px}
+ .section-tools select{flex:1 1 130px;max-width:none}
+ .section-tools .export-btn{flex:1 1 auto;white-space:normal}
  .onboarding-steps,.tutorial-grid{grid-template-columns:1fr}
  .tutorial-welcome{align-items:flex-start;flex-direction:column}
  .tour-card{bottom:10px}
