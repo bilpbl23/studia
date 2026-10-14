@@ -1,7 +1,8 @@
 const KEY="studia_tasks_v1";
 const DATA_VERSION_KEY="studia_data_version";
 const DATA_VERSION=2;
-const SOUND_KEY="studia_sound_enabled_v1";
+const ONBOARDING_KEY="studia_onboarding_v1";
+const ONBOARDING_VERSION=1;
 const TIMER_KEY="studia_focus_timer_v1";
 const STUDY_KEY="studia_focus_sessions_v1";
 const ACTIVITY_KEY="studia_activity_v1";
@@ -9,13 +10,16 @@ const BACKUP_FORMAT="studia-backup";
 const BACKUP_VERSION=1;
 let tasks=[];
 let activityEvents=[];
-let soundEnabled=true;
 let storageBlocked=false;
 let storageRawData=null;
 let storageWarning="";
-try{soundEnabled=localStorage.getItem(SOUND_KEY)!=="false"}catch(e){storageBlocked=true;storageWarning="Penyimpanan browser tidak dapat dibaca. Perubahan tidak akan tersimpan.";console.error("Sound preference unavailable",e)}
-let audioContext=null;
 let toastTimer=null;
+let onboardingStorage=null;
+let onboardingState={version:ONBOARDING_VERSION,introSeen:false,tourCompleted:false,
+ checklistDismissed:false,checklistCollapsed:false,scheduleVisited:false};
+let tourIndex=0;
+let tourTarget=null;
+let tourReturnFocus=null;
 let focusTimer={duration:25*60,remaining:25*60,endAt:null,taskId:"",mode:"focus",sessionId:null};
 let focusSessions=[];
 let timerInterval=null;
@@ -23,6 +27,134 @@ let selectedDate=new Date();
 let shownMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);
 const $=id=>document.getElementById(id);
 const months=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+const guidedTourSteps=[
+ {title:"Kenali dashboard",description:"Ringkasan ini menghubungkan status tugas, prioritas berikutnya, dan tenggat. Angka hanya berasal dari data yang tersimpan di browser ini.",view:"dashboard",target:".stats"},
+ {title:"Kelola tugas",description:"Buka My Tasks untuk membuat atau mengedit tugas. Isi nama, mata kuliah, dan deadline; simpan agar tugas masuk ke kalender dan prioritas.",view:"tasks",target:"#view-tasks .heading"},
+ {title:"Atur jadwal",description:"Schedule menempatkan tugas pada tanggal deadline. Pilih tanggal di kalender untuk melihat agenda hari itu.",view:"schedule",target:"#view-schedule .calendar"},
+ {title:"Pantau progres",description:"Monitoring menghitung total tugas, penyelesaian, tenggat terlewat, dan estimasi waktu dari status aktual.",view:"monitoring",target:"#view-monitoring .stats"},
+ {title:"Fitur lain yang tersedia",description:"Classroom mengelompokkan tugas menurut mata kuliah. Pengingat menampilkan deadline di dalam aplikasi—bukan chat dan tidak berjalan saat aplikasi ditutup.",view:"messages",target:"#view-messages .heading"},
+ {title:"Mulai sekarang",description:"Buat tugas pertamamu dari tombol ini. Tambahkan mata kuliah dan deadline agar tugas langsung muncul pada ringkasan serta kalender.",view:"dashboard",target:"#view-dashboard .heading .btn.primary"}
+];
+
+function loadOnboarding(){
+ try{
+  const raw=localStorage.getItem(ONBOARDING_KEY);
+  onboardingStorage=localStorage;
+  if(raw){
+   const saved=JSON.parse(raw);
+   if(saved&&saved.version===ONBOARDING_VERSION){
+    applyOnboardingState(saved);
+   }
+  }
+ }catch(error){
+  console.warn("Persistent onboarding state is unavailable; trying session storage.",error);
+  try{onboardingStorage=window.sessionStorage}catch(sessionAccessError){onboardingStorage=null}
+  try{
+   const raw=onboardingStorage?onboardingStorage.getItem(ONBOARDING_KEY):null,saved=raw?JSON.parse(raw):null;
+   if(saved&&saved.version===ONBOARDING_VERSION)applyOnboardingState(saved);
+  }catch(sessionError){console.warn("Session onboarding state is unavailable.",sessionError)}
+ }
+}
+function applyOnboardingState(saved){
+ onboardingState={...onboardingState,introSeen:saved.introSeen===true,
+  tourCompleted:saved.tourCompleted===true,checklistDismissed:saved.checklistDismissed===true,
+  checklistCollapsed:saved.checklistCollapsed===true,scheduleVisited:saved.scheduleVisited===true};
+}
+function saveOnboarding(){
+ onboardingState.version=ONBOARDING_VERSION;
+ const value=JSON.stringify(onboardingState);
+ try{
+  if(!onboardingStorage)onboardingStorage=localStorage;
+  onboardingStorage.setItem(ONBOARDING_KEY,value);return true;
+ }catch(error){
+  try{
+   const session=window.sessionStorage;
+   session.setItem(ONBOARDING_KEY,value);onboardingStorage=session;return true;
+  }catch(sessionError){console.warn("Onboarding state is only available for this page session.",sessionError)}
+  return false;
+ }
+}
+function openIntro(){
+ $("introOverlay").hidden=false;
+ $("skipIntroBtn").focus();
+}
+function closeIntro(startTour){
+ $("introOverlay").hidden=true;
+ onboardingState.introSeen=true;saveOnboarding();renderOnboarding();
+ if(startTour)startGuidedTour($("view-dashboard").querySelector(".heading h1"));
+ else $("view-dashboard").querySelector(".heading h1").focus();
+}
+function replayIntro(){
+ navigate("dashboard");openIntro();
+}
+function startGuidedTour(returnFocus=null){
+ tourReturnFocus=returnFocus instanceof HTMLElement?returnFocus:document.activeElement;
+ tourIndex=0;$("tourScrim").hidden=false;$("tourCard").hidden=false;
+ updateGuidedTourStep();
+}
+function updateGuidedTourStep(){
+ if(tourTarget)tourTarget.classList.remove("tour-highlight");
+ const step=guidedTourSteps[tourIndex];
+ if(!step)return;
+ navigate(step.view);
+ tourTarget=document.querySelector(step.target);
+ if(tourTarget){
+  tourTarget.classList.add("tour-highlight");
+  tourTarget.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center"});
+ }
+ $("tourProgress").textContent=(tourIndex+1)+" dari "+guidedTourSteps.length;
+ $("tourTitle").textContent=step.title;$("tourDescription").textContent=step.description;
+ $("tourPreviousBtn").disabled=tourIndex===0;
+ $("tourNextBtn").textContent=tourIndex===guidedTourSteps.length-1?"Selesai":"Berikutnya";
+ $("tourTitle").focus();
+}
+function endGuidedTour(completed=false){
+ if(tourTarget)tourTarget.classList.remove("tour-highlight");
+ tourTarget=null;$("tourCard").hidden=true;$("tourScrim").hidden=true;
+ if(completed){onboardingState.tourCompleted=true;saveOnboarding();showToast("Tur panduan selesai. Kamu bisa membukanya lagi dari Tutorial.");}
+ renderOnboarding();
+ const viewContainingFocus=typeof tourReturnFocus?.closest==="function"?tourReturnFocus.closest(".view"):null;
+ const canRestoreFocus=tourReturnFocus instanceof HTMLElement&&tourReturnFocus.isConnected&&
+  (!viewContainingFocus||viewContainingFocus.classList.contains("active"));
+ const focusTarget=canRestoreFocus?tourReturnFocus:document.querySelector(".view.active h1");
+ if(focusTarget){focusTarget.tabIndex=-1;focusTarget.focus()}
+ tourReturnFocus=null;
+}
+function advanceGuidedTour(delta){
+ const next=tourIndex+delta;
+ if(next<0)return;
+ if(next>=guidedTourSteps.length){endGuidedTour(true);return}
+ tourIndex=next;updateGuidedTourStep();
+}
+function renderOnboarding(){
+ const panel=$("onboardingChecklist");
+ if(!panel)return;
+ const userTasks=tasks.filter(task=>!task.isSample);
+ const hasTask=userTasks.length>0;
+ const hasDeadline=userTasks.some(task=>validTimestamp(task.deadline));
+ const items=[
+  {label:"Buat tugas pertamamu",done:hasTask,action:"task",button:"Tambah tugas"},
+  {label:"Tambahkan deadline ke tugas",done:hasDeadline,action:"task",button:"Atur deadline"},
+  {label:"Lihat deadline di kalender",done:onboardingState.scheduleVisited,action:"schedule",button:"Buka Schedule"},
+  {label:"Selesaikan tur panduan",done:onboardingState.tourCompleted,action:"tour",button:"Mulai tur"}
+ ];
+ const complete=items.every(item=>item.done);
+ panel.hidden=onboardingState.checklistDismissed;
+ $("onboardingSummary").textContent=complete?
+  "Langkah awal selesai. Kamu dapat membuka panduan kapan saja dari menu Tutorial.":
+  "Empat langkah singkat untuk mulai mengatur kegiatan akademikmu.";
+ $("onboardingSteps").innerHTML=items.map(item=>
+  `<li class="onboarding-step ${item.done?"is-done":""}"><span class="checkmark" aria-hidden="true">${item.done?"✓":"○"}</span><span class="onboarding-label">${esc(item.label)}</span>${item.done?"":`<button class="btn small" data-onboarding-action="${item.action}">${item.button}</button>`}</li>`
+ ).join("");
+ $("onboardingSteps").hidden=onboardingState.checklistCollapsed;
+ $("checklistCollapseBtn").textContent=onboardingState.checklistCollapsed?"Lihat langkah":"Ciutkan";
+ $("checklistCollapseBtn").setAttribute("aria-expanded",String(!onboardingState.checklistCollapsed));
+}
+function runOnboardingAction(action){
+ if(action==="task")openTask();
+ else if(action==="schedule")navigate("schedule");
+ else if(action==="tour")startGuidedTour();
+}
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2)}
 function localDate(d){return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16)}
@@ -97,33 +229,6 @@ function showToast(message,type="success"){
  window.clearTimeout(toastTimer);
  toastTimer=window.setTimeout(()=>toast.classList.remove("show"),3200);
 }
-function playSound(kind="tap"){
- if(!soundEnabled)return;
- try{
-  const AudioContextClass=window.AudioContext||window.webkitAudioContext;
-  if(!AudioContextClass){console.warn("Web Audio is not supported in this browser");return}
-  audioContext=audioContext||new AudioContextClass();
-  if(audioContext.state==="suspended")audioContext.resume().catch(e=>console.error("Audio playback unavailable",e));
-  const notes=kind==="success"?[660,880]:kind==="warning"?[440,330]:[520];
-  notes.forEach((frequency,index)=>{
-   const start=audioContext.currentTime+index*.11;
-   const oscillator=audioContext.createOscillator(),gain=audioContext.createGain();
-   oscillator.type="sine";oscillator.frequency.setValueAtTime(frequency,start);
-   gain.gain.setValueAtTime(.0001,start);gain.gain.exponentialRampToValueAtTime(.07,start+.015);
-   gain.gain.exponentialRampToValueAtTime(.0001,start+.13);
-   oscillator.connect(gain);gain.connect(audioContext.destination);
-   oscillator.start(start);oscillator.stop(start+.14);
-  });
- }catch(e){console.error("Could not play sound effect",e)}
-}
-function syncSoundButton(){
- const button=$("soundToggle");
- button.classList.toggle("muted",!soundEnabled);
- button.textContent=soundEnabled?"♫":"♪";
- button.title=soundEnabled?"Matikan efek suara":"Aktifkan efek suara";
- button.setAttribute("aria-label",button.title);
- button.setAttribute("aria-pressed",String(soundEnabled));
-}
 function loadFocusData(){
  try{
   const savedTimer=localStorage.getItem(TIMER_KEY);
@@ -196,13 +301,13 @@ function startOrPauseFocus(){
   focusTimer.remaining=Math.max(0,Math.ceil((focusTimer.endAt-Date.now())/1000));
   focusTimer.endAt=null;
   window.clearInterval(timerInterval);timerInterval=null;
-  saveFocusData();renderFocusTimer();playSound("tap");return;
+  saveFocusData();renderFocusTimer();return;
  }
  if(focusTimer.remaining===0)focusTimer.remaining=focusTimer.duration;
  focusTimer.taskId=$("timerTask").value;
  if(focusTimer.mode==="focus"&&!focusTimer.sessionId)focusTimer.sessionId=uid();
  focusTimer.endAt=Date.now()+focusTimer.remaining*1000;
- saveFocusData();renderFocusTimer();playSound("tap");
+ saveFocusData();renderFocusTimer();
  timerInterval=window.setInterval(updateFocusTick,250);
 }
 function resetFocusTimer(){
@@ -211,7 +316,7 @@ function resetFocusTimer(){
  focusTimer.duration=Number($("timerDuration").value)*60;
  focusTimer.remaining=focusTimer.duration;focusTimer.endAt=null;focusTimer.sessionId=null;
  focusTimer.taskId=$("timerTask").value;
- saveFocusData();renderFocusTimer();playSound("tap");
+ saveFocusData();renderFocusTimer();
 }
 function completeFocusSession(){
  window.clearInterval(timerInterval);timerInterval=null;
@@ -220,7 +325,7 @@ function completeFocusSession(){
   focusTimer.mode="focus";focusTimer.duration=Number($("timerDuration").value)*60;
   focusTimer.remaining=focusTimer.duration;focusTimer.sessionId=null;
   saveFocusData();renderFocusTimer();
-  showToast("Waktu istirahat selesai. Siap fokus lagi?");playSound("success");
+  showToast("Waktu istirahat selesai. Siap fokus lagi?");
   return;
  }
  const task=tasks.find(item=>item.id===focusTimer.taskId);
@@ -234,7 +339,6 @@ function completeFocusSession(){
  focusTimer.endAt=null;focusTimer.sessionId=null;
  saveFocusData();renderFocusTimer();renderDashboard();
  showToast(task?"Sesi fokus selesai untuk "+task.title+". Mulai istirahat 5 menit?":"Sesi fokus selesai. Mulai istirahat 5 menit?","success");
- playSound("success");
 }
 function load(){
  try{
@@ -283,7 +387,7 @@ function resetSamples(){
  ];
  activityEvents=[];
  if(!save())return;
- renderAll();showToast("Data contoh dimuat. Tugas contoh ditandai agar berbeda dari tugasmu.","success");playSound("success");
+ renderAll();showToast("Data contoh dimuat. Tugas contoh ditandai agar berbeda dari tugasmu.","success");
 }
 function isLate(t){return !t.done&&new Date(t.deadline).getTime()<Date.now()}
 function score(t){
@@ -319,7 +423,6 @@ function toggleDone(id){
  if(!save()){renderAll();return}
  renderAll();
  showToast(task.done?"Tugas selesai. Kerja bagus!":"Tugas dibuka kembali",task.done?"success":"");
- playSound(task.done?"success":"tap");
 }
 function removeTask(id){
  const t=tasks.find(x=>x.id===id);
@@ -327,12 +430,11 @@ function removeTask(id){
  if(t&&confirm('Hapus tugas "'+t.title+'"?')){
   tasks=tasks.filter(x=>x.id!==id);
   if(!save()){renderAll();return}
-  renderAll();showToast("Tugas berhasil dihapus","warning");playSound("warning")
+  renderAll();showToast("Tugas berhasil dihapus","warning")
  }
 }
 function openTask(t=null){
  if(storageBlocked){showToast("Perubahan diblokir agar data yang tidak terbaca tidak tertimpa.","warning");return}
- playSound("tap");
  $("taskForm").reset();$("formError").textContent="";$("taskId").value=t?t.id:"";
  $("formTitle").textContent=t?"Edit Tugas":"Tambah Tugas";
  if(t){
@@ -362,7 +464,7 @@ $("taskForm").addEventListener("submit",e=>{
  tasks=id?tasks.map(t=>t.id===id?item:t):[...tasks,item];
  if(!id)recordActivity("created",item);
  if(!save()){renderAll();return}
- closeTask();renderAll();showToast(id?"Tugas berhasil diperbarui":"Tugas baru berhasil ditambahkan");playSound("success");
+ closeTask();renderAll();showToast(id?"Tugas berhasil diperbarui":"Tugas baru berhasil ditambahkan");
 });
 function taskCard(t){
  const b=badge(t);
@@ -397,7 +499,7 @@ function exportTasks(){
  link.href=url;link.download="studia-tugas-"+dayKey(new Date())+".csv";
  document.body.appendChild(link);link.click();link.remove();
  window.setTimeout(()=>URL.revokeObjectURL(url),1000);
- showToast("Laporan tugas berhasil diunduh");playSound("success");
+ showToast("Laporan tugas berhasil diunduh");
 }
 function downloadJson(filename,value){
  const url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:"application/json"}));
@@ -409,9 +511,9 @@ function exportBackup(){
  downloadJson("studia-backup-"+dayKey(new Date())+".json",{
   format:BACKUP_FORMAT,version:BACKUP_VERSION,exportedAt:new Date().toISOString(),
   tasks,activityEvents:activityEvents.slice(-2000),focusSessions:focusSessions.slice(-500),
-  focusTimer,soundEnabled
+  focusTimer
  });
- showToast("Cadangan Studia berhasil diunduh");playSound("success");
+ showToast("Cadangan Studia berhasil diunduh");
 }
 function parseBackup(data){
  if(!data||data.format!==BACKUP_FORMAT||data.version!==BACKUP_VERSION||
@@ -443,7 +545,7 @@ function parseBackup(data){
    endAt:Number.isFinite(Number(timer.endAt))&&timer.endAt?Number(timer.endAt):null,
    taskId:typeof timer.taskId==="string"?timer.taskId:"",
    sessionId:typeof timer.sessionId==="string"?timer.sessionId:null},
-  soundEnabled:data.soundEnabled!==false};
+  };
 }
 async function importBackupFile(file){
  if(!file)return;
@@ -451,23 +553,22 @@ async function importBackupFile(file){
  try{imported=parseBackup(JSON.parse(await file.text()))}
  catch(error){showToast(error instanceof SyntaxError?"File cadangan bukan JSON yang valid.":error.message,"warning");return}
  if(!confirm("Cadangan ini akan mengganti tugas, riwayat, dan pengaturan Studia di browser ini. Lanjutkan?"))return;
- const keys=[KEY,ACTIVITY_KEY,DATA_VERSION_KEY,STUDY_KEY,TIMER_KEY,SOUND_KEY];
+ const keys=[KEY,ACTIVITY_KEY,DATA_VERSION_KEY,STUDY_KEY,TIMER_KEY];
  let previous;
  try{previous=keys.map(key=>localStorage.getItem(key))}
  catch(error){setStorageNotice("Tidak dapat membaca data sebelum pemulihan. Cadangan tidak diimpor.",null);console.error("Could not snapshot storage before import",error);return}
- const oldState={tasks,activityEvents,focusSessions,focusTimer,soundEnabled,storageBlocked,storageWarning,storageRawData};
+ const oldState={tasks,activityEvents,focusSessions,focusTimer,storageBlocked,storageWarning,storageRawData};
  tasks=imported.tasks;activityEvents=imported.activityEvents;focusSessions=imported.focusSessions;
- focusTimer=imported.focusTimer;soundEnabled=imported.soundEnabled;storageBlocked=false;
+ focusTimer=imported.focusTimer;storageBlocked=false;
  try{
   localStorage.setItem(KEY,JSON.stringify(tasks));
   localStorage.setItem(ACTIVITY_KEY,JSON.stringify(activityEvents));
   localStorage.setItem(DATA_VERSION_KEY,String(DATA_VERSION));
   localStorage.setItem(STUDY_KEY,JSON.stringify(focusSessions));
   localStorage.setItem(TIMER_KEY,JSON.stringify(focusTimer));
-  localStorage.setItem(SOUND_KEY,String(soundEnabled));
  }catch(error){
-  [tasks,activityEvents,focusSessions,focusTimer,soundEnabled,storageBlocked,storageWarning,storageRawData]=
-   [oldState.tasks,oldState.activityEvents,oldState.focusSessions,oldState.focusTimer,oldState.soundEnabled,true,
+  [tasks,activityEvents,focusSessions,focusTimer,storageBlocked,storageWarning,storageRawData]=
+   [oldState.tasks,oldState.activityEvents,oldState.focusSessions,oldState.focusTimer,true,
     "Pemulihan gagal; data sebelumnya dipertahankan jika browser mengizinkan pemulihan.",null];
   keys.forEach((key,index)=>{
    try{if(previous[index]===null)localStorage.removeItem(key);else localStorage.setItem(key,previous[index])}
@@ -477,9 +578,9 @@ async function importBackupFile(file){
   console.error("Could not import Studia backup",error);return;
  }
  storageWarning="";storageRawData=null;window.clearInterval(timerInterval);timerInterval=null;
- setStorageNotice("");syncSoundButton();renderAll();
+ setStorageNotice("");renderAll();
  if(focusTimer.endAt){timerInterval=window.setInterval(updateFocusTick,250);updateFocusTick()}
- showToast("Cadangan berhasil dipulihkan");playSound("success");
+ showToast("Cadangan berhasil dipulihkan");
 }
 function downloadRecoveryData(){
  if(storageRawData!==null)downloadJson("studia-data-pemulihan-"+dayKey(new Date())+".json",{
@@ -633,20 +734,30 @@ function renderMessages(){
  $("notificationDot").classList.toggle("active",actionable>0);
 }
 function openNotifications(){
- renderMessages();$("notificationModal").classList.add("open");playSound("tap");
+ renderMessages();$("notificationModal").classList.add("open");
  $("closeNotificationsBtn").focus();
 }
 function closeNotifications(){$("notificationModal").classList.remove("open")}
 function renderAll(){
  renderDashboard();renderTasks();renderCalendar();renderMonitoring();renderClassroom();renderMessages();
  renderFocusTimer();
+ renderOnboarding();
 }
 function navigate(view){
+ if(!$("view-"+view))return;
  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
  $("view-"+view).classList.add("active");
- document.querySelectorAll(".nav[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===view));
+ document.querySelectorAll(".nav[data-view]").forEach(button=>{
+  const current=button.dataset.view===view;
+  button.classList.toggle("active",current);
+  if(current)button.setAttribute("aria-current","page");
+  else button.removeAttribute("aria-current");
+ });
  $("sidebar").classList.remove("open");
  if(view==="tasks")renderTasks();
+ if(view==="schedule"&&!onboardingState.scheduleVisited){
+  onboardingState.scheduleVisited=true;saveOnboarding();renderOnboarding();
+ }
  window.scrollTo({top:0,behavior:"smooth"});
 }
 document.querySelectorAll(".nav[data-view]").forEach(b=>b.addEventListener("click",()=>navigate(b.dataset.view)));
@@ -675,17 +786,45 @@ $("menuBtn").onclick=()=>$("sidebar").classList.toggle("open");
  $("notificationBtn").onclick=openNotifications;
  $("closeNotificationsBtn").onclick=closeNotifications;
  $("allMessagesBtn").onclick=()=>{closeNotifications();navigate("messages")};
- $("soundToggle").onclick=()=>{
-  if(storageBlocked){showToast("Penyimpanan tidak tersedia; preferensi suara tidak dapat disimpan.","warning");return}
-  soundEnabled=!soundEnabled;
-  try{localStorage.setItem(SOUND_KEY,String(soundEnabled))}catch(e){
-   storageBlocked=true;setStorageNotice("Preferensi suara belum tersimpan karena penyimpanan browser gagal.",null);
-   console.error("Could not save sound preference",e);return;
-  }
-  syncSoundButton();playSound("tap");
-  showToast(soundEnabled?"Efek suara diaktifkan":"Efek suara dimatikan");
+ $("startJourneyBtn").onclick=()=>closeIntro(true);
+ $("skipIntroBtn").onclick=()=>closeIntro(false);
+ $("restartTourBtn").onclick=startGuidedTour;
+ $("replayIntroBtn").onclick=replayIntro;
+ $("tourPreviousBtn").onclick=()=>advanceGuidedTour(-1);
+ $("tourNextBtn").onclick=()=>advanceGuidedTour(1);
+ $("tourSkipBtn").onclick=$("tourSkipBottomBtn").onclick=()=>endGuidedTour(false);
+ $("tourScrim").onclick=()=>endGuidedTour(false);
+ $("checklistCollapseBtn").onclick=()=>{
+  onboardingState.checklistCollapsed=!onboardingState.checklistCollapsed;
+  saveOnboarding();renderOnboarding();
  };
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeTask();closeNotifications()}});
-syncSoundButton();
+ $("checklistDismissBtn").onclick=()=>{
+  onboardingState.checklistDismissed=true;saveOnboarding();renderOnboarding();
+ };
+ $("onboardingSteps").addEventListener("click",event=>{
+  const button=event.target.closest("[data-onboarding-action]");
+  if(button)runOnboardingAction(button.dataset.onboardingAction);
+ });
+ document.addEventListener("keydown",event=>{
+  if(!$("introOverlay").hidden){
+   if(event.key==="Escape"){event.preventDefault();closeIntro(false)}
+   else if(event.key==="Tab"){
+    const controls=[$("startJourneyBtn"),$("skipIntroBtn")];
+    const first=controls[0],last=controls[1];
+    if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}
+    else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}
+   }
+   return;
+  }
+  if(!$("tourCard").hidden){
+   if(event.key==="Escape"){event.preventDefault();endGuidedTour(false)}
+   else if(event.key==="ArrowRight")advanceGuidedTour(1);
+   else if(event.key==="ArrowLeft")advanceGuidedTour(-1);
+   return;
+  }
+  if(event.key==="Escape"){closeTask();closeNotifications()}
+ });
+loadOnboarding();
 load();loadFocusData();renderAll();
 if(focusTimer.endAt){timerInterval=window.setInterval(updateFocusTick,250);updateFocusTick()}
+if(!onboardingState.introSeen)openIntro();

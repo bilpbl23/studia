@@ -20,12 +20,18 @@ selesai di tab **Actions**.
 - Cadangan dan pemulihan data lokal dalam format JSON.
 - Focus Timer Pomodoro dengan sesi istirahat, riwayat, dan atribusi tugas.
 - Grafik penyelesaian berbasis riwayat perubahan status yang benar-benar tercatat.
-- Pengingat di dalam aplikasi saat halaman dibuka, toast, dan efek suara opsional.
+- Intro first-run yang dapat dilewati, tur interaktif, checklist langkah awal, dan
+  Tutorial permanen.
+- Pengingat deadline di dalam aplikasi saat halaman dibuka dan toast status.
 - Layout responsif untuk layar komputer dan ponsel.
 
 Riwayat aktivitas baru mulai direkam setelah versi yang mendukungnya digunakan.
 Tugas lama tetap dimuat, tetapi tidak dipakai untuk merekonstruksi grafik historis.
 Pengingat bukan browser notification dan tidak berjalan saat website ditutup.
+Classroom mengelompokkan tugas berdasarkan mata kuliah, sedangkan Pengingat
+menampilkan peringatan deadline; keduanya bukan ruang kelas daring atau chat.
+Sound effect berdiri sendiri telah dihapus. Intro berlangsung setelah pengguna
+membuka Studia, tanpa autoplay audio.
 
 ## Pengembangan dan pemeriksaan
 

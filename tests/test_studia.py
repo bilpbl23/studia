@@ -21,10 +21,35 @@ class StudiaWebTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         page = response.get_data(as_text=True)
-        self.assertIn('href="static/studia.css?v=2"', page)
-        self.assertIn('src="static/studia.js?v=2"', page)
+        self.assertIn('href="static/studia.css?v=6"', page)
+        self.assertIn('src="static/studia.js?v=6"', page)
         self.assertNotIn("<style>", page)
         self.assertNotIn("<script>\n", page)
+
+    def test_first_visit_onboarding_and_permanent_tutorial_are_present(self):
+        self.assertIn('id="introOverlay"', HTML)
+        self.assertIn('id="startJourneyBtn"', HTML)
+        self.assertIn('id="skipIntroBtn"', HTML)
+        self.assertIn('id="onboardingChecklist"', HTML)
+        self.assertIn('data-view="tutorial"', HTML)
+        self.assertIn('id="view-tutorial"', HTML)
+
+        javascript = (PROJECT_ROOT / "static" / "studia.js").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn('const ONBOARDING_KEY="studia_onboarding_v1"', javascript)
+        self.assertIn("function startGuidedTour", javascript)
+        self.assertIn("function renderOnboarding()", javascript)
+        self.assertIn("onboardingState.scheduleVisited=true", javascript)
+        self.assertIn("onboardingState.tourCompleted=true", javascript)
+
+    def test_standalone_sound_control_is_removed(self):
+        self.assertNotIn('id="soundToggle"', HTML)
+        javascript = (PROJECT_ROOT / "static" / "studia.js").read_text(
+            encoding="utf-8"
+        )
+        self.assertNotIn("function playSound(", javascript)
+        self.assertNotIn("studia_sound_enabled_v1", javascript)
 
     def test_frontend_assets_are_served(self):
         for asset in ("studia.css", "studia.js"):

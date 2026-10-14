@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-10-14 — Guided onboarding
+
+- Menambahkan intro first-run singkat yang dapat dilewati, diputar ulang, dan
+  mengikuti preferensi reduced motion tanpa menunda akses ke aplikasi.
+- Menambahkan tur enam langkah dengan highlight pada halaman dan kontrol nyata,
+  dukungan keyboard, serta aksi untuk melewati atau menyelesaikannya.
+- Menambahkan checklist dashboard yang memakai tugas pengguna, kunjungan Schedule,
+  dan penyelesaian tur sebagai kriteria aktual.
+- Menambahkan Tutorial permanen yang menjelaskan batas fungsi Classroom dan
+  Pengingat deadline secara akurat; label Messages yang menyerupai chat diganti
+  menjadi Pengingat.
+- Menghapus kontrol dan efek suara mandiri tanpa mengubah tugas, timer, maupun
+  riwayat tersimpan; backup lama dengan field suara tetap dapat diimpor.
+
 ## 2026-10-14
 
 - Memisahkan stylesheet dan JavaScript ke aset statis, serta menyertakannya dalam

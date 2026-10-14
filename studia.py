@@ -12,20 +12,21 @@ HTML = r"""
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Studia | Academic Workspace</title>
-<link rel="stylesheet" href="static/studia.css?v=2">
+<link rel="stylesheet" href="static/studia.css?v=6">
 </head>
 <body>
 <div class="app">
 <aside class="sidebar" id="sidebar">
  <div class="brand">Studia<span>.</span><small>ACADEMIC WORKSPACE</small></div>
  <div class="nav-label">GENERAL</div>
- <button class="nav active" data-view="dashboard"><span class="ico">⌂</span>Dashboard</button>
+ <button class="nav active" data-view="dashboard" aria-current="page"><span class="ico">⌂</span>Dashboard</button>
  <button class="nav" data-view="tasks"><span class="ico">▤</span>My Tasks<span class="count" id="navPending">0</span></button>
  <button class="nav" data-view="schedule"><span class="ico">▦</span>Schedule</button>
  <button class="nav" data-view="monitoring"><span class="ico">◉</span>Monitoring</button>
+ <button class="nav" data-view="tutorial"><span class="ico">?</span>Tutorial</button>
  <div class="nav-label">WORKSPACE</div>
  <button class="nav" data-view="classroom"><span class="ico">▣</span>Classroom</button>
- <button class="nav" data-view="messages"><span class="ico">✉</span>Messages</button>
+ <button class="nav" data-view="messages"><span class="ico">✉</span>Pengingat</button>
  <div class="sidebar-bottom">
   <button class="nav" id="sampleBtn"><span class="ico">✦</span>Muat data contoh</button>
   <div class="upgrade"><strong>Study smarter.</strong>
@@ -49,7 +50,6 @@ HTML = r"""
   <div class="top-actions">
    <button class="icon-btn" title="Agenda" onclick="navigate('schedule')">♧</button>
    <button class="icon-btn notification-trigger" id="notificationBtn" title="Buka notifikasi" aria-label="Buka notifikasi" aria-haspopup="dialog" aria-controls="notificationModal">♢<span class="notification-dot" id="notificationDot"></span></button>
-   <button class="icon-btn sound-toggle" id="soundToggle" title="Matikan efek suara" aria-label="Matikan efek suara">♫</button>
    <div class="avatar" title="Student">S</div>
   </div>
  </div>
@@ -57,12 +57,20 @@ HTML = r"""
  <section class="view active" id="view-dashboard">
   <header class="heading">
    <div><div class="eyebrow">STUDIA · YOUR ACADEMIC SPACE</div>
-    <h1>Selamat datang di Studia.</h1>
+    <h1 tabindex="-1">Selamat datang di Studia.</h1>
     <div class="muted" style="font-size:12px">Satu tempat untuk mengatur progres dan aktivitas kuliahmu.</div>
     <div class="sub" id="today"></div>
    </div>
    <button class="btn primary" onclick="openTask()">＋ Tambah Tugas</button>
   </header>
+
+  <section class="card onboarding-card" id="onboardingChecklist" aria-labelledby="onboardingTitle" hidden>
+   <div class="card-head">
+    <div><div class="eyebrow">MULAI DENGAN LANGKAH SEDERHANA</div><h2 id="onboardingTitle">Mulai dari Sini</h2><div class="sub" id="onboardingSummary">Kenali ruang kerja dan siapkan rencana kuliahmu.</div></div>
+    <div class="onboarding-actions"><button class="btn small" id="checklistCollapseBtn" aria-expanded="true" aria-controls="onboardingSteps">Ciutkan</button><button class="icon-btn" id="checklistDismissBtn" aria-label="Sembunyikan checklist" title="Sembunyikan checklist">×</button></div>
+   </div>
+   <ol class="onboarding-steps" id="onboardingSteps"></ol>
+  </section>
 
   <div class="stats">
    <div class="card"><div class="stat-top"><span class="stat-icon">◉</span><span class="trend">ACADEMIC</span></div><div class="stat-label">Task Completion</div><div class="stat-number" id="completionStat">0%</div><div class="stat-foot">Persentase tugas selesai</div></div>
@@ -190,13 +198,48 @@ HTML = r"""
  </section>
 
  <section class="view" id="view-messages">
-  <header class="heading"><div><div class="eyebrow">NOTIFICATIONS</div><h1>Messages</h1><div class="muted">Pengingat berdasarkan kondisi tugasmu.</div></div></header>
+  <header class="heading"><div><div class="eyebrow">NOTIFIKASI DEADLINE</div><h1>Pengingat</h1><div class="muted">Pengingat deadline berdasarkan tugas yang tersimpan di browser ini.</div></div></header>
   <section class="card"><div id="messageList"></div></section>
+ </section>
+
+ <section class="view" id="view-tutorial">
+  <header class="heading"><div><div class="eyebrow">PANDUAN STUDIA</div><h1>Tutorial</h1><div class="muted">Panduan singkat untuk fitur yang tersedia saat ini.</div></div><button class="btn" onclick="navigate('dashboard')">Kembali ke dashboard</button></header>
+  <section class="card tutorial-welcome">
+   <div><h2>Mulai dengan lebih percaya diri</h2><div class="sub">Tur interaktif menyorot bagian aplikasi yang sedang dijelaskan. Kamu bisa berhenti kapan saja.</div></div>
+   <div class="task-row-actions"><button class="btn primary" id="restartTourBtn">Mulai tur panduan</button><button class="btn" id="replayIntroBtn">Putar intro lagi</button></div>
+  </section>
+  <div class="tutorial-grid">
+   <article class="card tutorial-guide"><span class="pill">DASHBOARD</span><h2>Kenali ringkasan</h2><p class="sub">Dashboard merangkum jumlah dan status tugas, tenggat terdekat, aktivitas deadline, serta agenda pada tanggal pilihan. Statistik dihitung dari tugas yang tersimpan di browser ini.</p><button class="btn small" onclick="navigate('dashboard')">Buka dashboard</button></article>
+   <article class="card tutorial-guide"><span class="pill">TUGAS</span><h2>Buat tugas dan deadline</h2><ol><li>Buka My Tasks atau tekan Tambah Tugas.</li><li>Isi nama tugas, mata kuliah, dan deadline.</li><li>Pilih kepentingan dan estimasi, lalu simpan.</li></ol><p class="sub">Prioritas diurutkan dari deadline, kepentingan, dan estimasi. Tugas tersimpan lokal pada browser ini.</p><button class="btn small" onclick="navigate('tasks');openTask()">Buat tugas</button></article>
+   <article class="card tutorial-guide"><span class="pill">JADWAL</span><h2>Periksa kalender</h2><p class="sub">Schedule menampilkan kalender dan tugas menurut tanggal deadline. Pilih hari untuk melihat agenda; kalender dashboard memakai data tugas yang sama.</p><button class="btn small" onclick="navigate('schedule')">Buka Schedule</button></article>
+   <article class="card tutorial-guide"><span class="pill">PROGRES</span><h2>Pantau progres</h2><p class="sub">Monitoring merangkum status aktual tugas. Tandai tugas selesai dari daftar atau agenda; grafik aktivitas hanya mencatat penyelesaian yang terjadi setelah riwayat mulai direkam.</p><button class="btn small" onclick="navigate('monitoring')">Buka Monitoring</button></article>
+   <article class="card tutorial-guide"><span class="pill">MATA KULIAH</span><h2>Classroom</h2><p class="sub">Halaman ini mengelompokkan tugas berdasarkan nama mata kuliah yang kamu masukkan. Ini bukan ruang kelas daring dan tidak mengelola peserta atau materi kuliah.</p><button class="btn small" onclick="navigate('classroom')">Buka Classroom</button></article>
+   <article class="card tutorial-guide"><span class="pill">PENGINGAT</span><h2>Pengingat deadline</h2><p class="sub">Halaman Pengingat menampilkan pemberitahuan dari deadline tugas yang tersimpan. Ini bukan chat, tidak mengirim pesan, dan tidak berjalan saat aplikasi ditutup.</p><button class="btn small" onclick="navigate('messages')">Buka Pengingat</button></article>
+   <article class="card tutorial-guide"><span class="pill">FOKUS & DATA</span><h2>Belajar dan simpan data</h2><p class="sub">Focus Timer dapat dikaitkan dengan tugas dan menyimpan sesi di browser. My Tasks menyediakan ekspor CSV serta cadangan/pemulihan JSON agar data bisa kamu pindahkan secara manual.</p><button class="btn small" onclick="navigate('dashboard');document.getElementById('focusTimerCard').scrollIntoView({behavior:'smooth',block:'center'})">Lihat Focus Timer</button></article>
+  </div>
  </section>
 
  <footer>STUDIA © 2026 · YOUR ACADEMIC LIFE, ORGANIZED.</footer>
 </main>
 </div>
+
+<section class="intro-overlay" id="introOverlay" aria-labelledby="introTitle" hidden>
+ <div class="intro-card" role="dialog" aria-modal="true" aria-labelledby="introTitle" aria-describedby="introDescription">
+  <div class="intro-orbit" aria-hidden="true"><span class="intro-mark">S<span>.</span></span></div>
+  <div class="eyebrow">STUDIA · YOUR ACADEMIC SPACE</div>
+  <h1 id="introTitle">Your academic journey starts here.</h1>
+  <p id="introDescription">Kelola tugas, atur deadline, dan pantau progres akademikmu dalam satu ruang kerja yang terorganisasi.</p>
+  <div class="intro-actions"><button class="btn primary" id="startJourneyBtn">Mulai Perjalanan</button><button class="btn" id="skipIntroBtn">Lewati Intro</button></div>
+  <span class="intro-note">Data tugas tersimpan secara lokal di browser ini.</span>
+ </div>
+</section>
+
+<div class="tour-scrim" id="tourScrim" hidden></div>
+<section class="tour-card" id="tourCard" role="dialog" aria-labelledby="tourTitle" aria-describedby="tourDescription" aria-modal="false" hidden>
+ <div class="tour-topline"><span class="pill" id="tourProgress" aria-live="polite" aria-atomic="true">1 dari 6</span><button class="tour-close" id="tourSkipBtn" aria-label="Lewati tur">Lewati tur ×</button></div>
+ <h2 id="tourTitle" tabindex="-1"></h2><p class="sub" id="tourDescription"></p>
+ <div class="tour-controls"><button class="btn" id="tourPreviousBtn">Sebelumnya</button><div><button class="btn" id="tourSkipBottomBtn">Lewati</button> <button class="btn primary" id="tourNextBtn">Berikutnya</button></div></div>
+</section>
 
 <div class="modal" id="taskModal" onclick="if(event.target===this)closeTask()">
  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="formTitle">
@@ -222,13 +265,13 @@ HTML = r"""
   <div class="popup-head"><div><div class="eyebrow">STUDIA INBOX</div><h2 id="notificationTitle" style="margin-top:7px">Notifikasi</h2></div><button class="icon-btn" id="closeNotificationsBtn" aria-label="Tutup notifikasi">×</button></div>
   <div class="sub">Pengingat hanya ditampilkan saat Studia dibuka; tidak ada notifikasi latar belakang.</div>
   <div class="popup-list" id="notificationList"></div>
-  <div class="popup-actions"><button class="btn" onclick="closeNotifications()">Tutup</button><button class="btn primary" id="allMessagesBtn">Lihat semua pesan</button></div>
+  <div class="popup-actions"><button class="btn" onclick="closeNotifications()">Tutup</button><button class="btn primary" id="allMessagesBtn">Lihat semua pengingat</button></div>
  </section>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"><span class="toast-mark" id="toastMark">✓</span><span id="toastMessage"></span></div>
 
 
-<script src="static/studia.js?v=2" defer></script>
+<script src="static/studia.js?v=6" defer></script>
 </body>
 </html>
 """

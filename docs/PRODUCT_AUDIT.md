@@ -47,3 +47,28 @@
 Audit deployment live memerlukan status GitHub Actions dan pemeriksaan URL yang
 berhasil. Build lokal atau commit/push saja tidak membuktikan website produksi
 telah diperbarui.
+
+## Audit pengalaman pertama dan perubahan onboarding
+
+- Dashboard, Tasks, Schedule, Monitoring, Classroom, Pengingat, dan Focus Timer
+  tersedia. Classroom mengelompokkan subject pada tugas; Pengingat adalah daftar
+  pengingat deadline di aplikasi, bukan chat. Keduanya dijelaskan sesuai batas
+  implementasi.
+- Intro singkat muncul hanya sebelum onboarding versi 1 ditandai selesai; tombol
+  Mulai Perjalanan memulai tur, Lewati Intro langsung membuka dashboard, dan
+  Tutorial menyediakan akses untuk mengulang intro maupun tur.
+- Tur enam langkah menyorot dashboard, form tugas, kalender Schedule, Monitoring,
+  Pengingat/Classroom, dan aksi Tambah Tugas. Escape dan tombol Lewati menutup tur;
+  navigasi panah dan kontrol Sebelumnya/Berikutnya tersedia.
+- Checklist dashboard memakai tugas non-contoh dengan deadline, navigasi Schedule,
+  dan penyelesaian tur sebagai state; data tersebut tidak menyalin tugas ke key
+  onboarding.
+- State onboarding disimpan pada `studia_onboarding_v1`; bila LocalStorage gagal,
+  aplikasi mencoba SessionStorage lalu tetap berjalan tanpa penyimpanan state
+  lintas sesi. Data tugas tidak disentuh oleh reset/replay onboarding.
+- Efek suara mandiri dihapus; data sound preference lama tidak dibaca atau dihapus,
+  dan backup lama yang memuat `soundEnabled` tetap diabaikan secara kompatibel.
+- Repository tidak berisi konfigurasi, project ID, atau riwayat deployment Vercel.
+  URL dengan pola nama proyek yang merespons publik tidak cukup membuktikan
+  hubungan dengan repository ini; verifikasi Vercel memerlukan deployment record
+  atau akses project yang terhubung.
