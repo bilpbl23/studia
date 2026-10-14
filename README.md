@@ -48,8 +48,8 @@ membuka Studia, tanpa memutar audio secara otomatis.
 ## Pengembangan dan pemeriksaan
 
 Source frontend berada di `static/studia.css` dan `static/studia.js`; Flask
-menyajikan file tersebut untuk penggunaan lokal. Workflow Pages menyalin aset yang
-sama bersama `index.html` ke `_site/`.
+menyajikan file tersebut untuk penggunaan lokal maupun Vercel melalui entrypoint
+`app.py`. Workflow Pages tetap menyalin HTML yang sama bersama aset ke `_site/`.
 
 Jalankan pemeriksaan:
 

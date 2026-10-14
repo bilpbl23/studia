@@ -9,6 +9,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
+from app import app as vercel_app
 from studia import HTML, app
 
 
@@ -25,6 +26,13 @@ class StudiaWebTests(unittest.TestCase):
         self.assertIn('src="static/studia.js?v=8"', page)
         self.assertNotIn("<style>", page)
         self.assertNotIn("<script>\n", page)
+
+    def test_vercel_flask_entrypoint_serves_the_existing_app(self):
+        self.assertIs(vercel_app, app)
+        response = vercel_app.test_client().get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Jadwal & Agenda", response.get_data(as_text=True))
 
     def test_first_visit_onboarding_and_permanent_tutorial_are_present(self):
         self.assertIn('id="introOverlay"', HTML)
