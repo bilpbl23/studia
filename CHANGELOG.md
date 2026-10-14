@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-10-14 — Data demo aman dan kalender deadline
+
+- Menghapus Classroom dari navigasi, halaman, dan tutorial tanpa mengubah fitur
+  Pengingat.
+- Memisahkan Data Demo dari tugas pribadi, memberi penanda pada demo, dan
+  menyediakan aksi muat/hapus tanpa mengganti data pribadi.
+- Mengonversi contoh demo lama dari daftar tugas utama ke penyimpanan demo
+  terpisah, serta mengecualikan demo dari cadangan JSON.
+- Menyelaraskan kalender agar dimulai Senin, menyorot tenggat dan status selesai,
+  serta menampilkan tanggal lengkap berbahasa Indonesia di agenda dan detail.
+- Menghitung kalender menurut tanggal lokal dan memperbarui pilihan agenda saat
+  pengguna berpindah bulan.
+
 ## 2026-10-14 — Guided onboarding
 
 - Menambahkan intro first-run singkat yang dapat dilewati, diputar ulang, dan
@@ -8,9 +21,8 @@
   dukungan keyboard, serta aksi untuk melewati atau menyelesaikannya.
 - Menambahkan checklist dashboard yang memakai tugas pengguna, kunjungan Schedule,
   dan penyelesaian tur sebagai kriteria aktual.
-- Menambahkan Tutorial permanen yang menjelaskan batas fungsi Classroom dan
-  Pengingat deadline secara akurat; label Messages yang menyerupai chat diganti
-  menjadi Pengingat.
+- Menambahkan Tutorial permanen yang menjelaskan Pengingat deadline secara
+  akurat; label Messages yang menyerupai chat diganti menjadi Pengingat.
 - Menghapus kontrol dan efek suara mandiri tanpa mengubah tugas, timer, maupun
   riwayat tersimpan; backup lama dengan field suara tetap dapat diimpor.
 

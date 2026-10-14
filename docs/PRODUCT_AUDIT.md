@@ -50,15 +50,13 @@ telah diperbarui.
 
 ## Audit pengalaman pertama dan perubahan onboarding
 
-- Dashboard, Tasks, Schedule, Monitoring, Classroom, Pengingat, dan Focus Timer
-  tersedia. Classroom mengelompokkan subject pada tugas; Pengingat adalah daftar
-  pengingat deadline di aplikasi, bukan chat. Keduanya dijelaskan sesuai batas
-  implementasi.
+- Dashboard, Tasks, Schedule, Monitoring, Pengingat, dan Focus Timer tersedia.
+  Pengingat adalah daftar deadline di aplikasi, bukan chat.
 - Intro singkat muncul hanya sebelum onboarding versi 1 ditandai selesai; tombol
   Mulai Perjalanan memulai tur, Lewati Intro langsung membuka dashboard, dan
   Tutorial menyediakan akses untuk mengulang intro maupun tur.
 - Tur enam langkah menyorot dashboard, form tugas, kalender Schedule, Monitoring,
-  Pengingat/Classroom, dan aksi Tambah Tugas. Escape dan tombol Lewati menutup tur;
+  Pengingat, dan aksi Tambah Tugas. Escape dan tombol Lewati menutup tur;
   navigasi panah dan kontrol Sebelumnya/Berikutnya tersedia.
 - Checklist dashboard memakai tugas non-contoh dengan deadline, navigasi Schedule,
   dan penyelesaian tur sebagai state; data tersebut tidak menyalin tugas ke key
@@ -72,3 +70,15 @@ telah diperbarui.
   URL dengan pola nama proyek yang merespons publik tidak cukup membuktikan
   hubungan dengan repository ini; verifikasi Vercel memerlukan deployment record
   atau akses project yang terhubung.
+
+## Revisi mode demo dan kalender deadline
+
+- Navigasi dan tampilan Classroom dihapus; navigasi Pengingat tetap tersedia.
+- Data Demo disimpan pada `studia_demo_tasks_v1`, terpisah dari tugas pribadi pada
+  `studia_tasks_v1`. Contoh legacy bermigrasi ketika dibaca; muat/hapus demo tidak
+  mengganti daftar tugas pribadi. Cadangan JSON hanya membawa tugas pribadi.
+- Statistik, daftar, kalender, dan prioritas menggunakan gabungan tugas pribadi
+  dan demo yang sedang aktif; setiap demo diberi penanda visual.
+- Kalender menggunakan pekan Senin–Minggu dan tanggal lokal dari objek `Date`.
+  Agenda menampilkan nama hari, tanggal lengkap, waktu, mata kuliah, status, dan
+  penanda Data Demo. Perpindahan bulan memilih hari pertama bulan baru.

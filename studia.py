@@ -12,7 +12,7 @@ HTML = r"""
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Studia | Academic Workspace</title>
-<link rel="stylesheet" href="static/studia.css?v=6">
+<link rel="stylesheet" href="static/studia.css?v=7">
 </head>
 <body>
 <div class="app">
@@ -24,11 +24,10 @@ HTML = r"""
  <button class="nav" data-view="schedule"><span class="ico">▦</span>Schedule</button>
  <button class="nav" data-view="monitoring"><span class="ico">◉</span>Monitoring</button>
  <button class="nav" data-view="tutorial"><span class="ico">?</span>Tutorial</button>
- <div class="nav-label">WORKSPACE</div>
- <button class="nav" data-view="classroom"><span class="ico">▣</span>Classroom</button>
  <button class="nav" data-view="messages"><span class="ico">✉</span>Pengingat</button>
  <div class="sidebar-bottom">
-  <button class="nav" id="sampleBtn"><span class="ico">✦</span>Muat data contoh</button>
+  <button class="nav" id="sampleBtn"><span class="ico">✦</span>Muat Data Demo</button>
+  <button class="nav" id="removeDemoBtn" hidden><span class="ico">×</span>Hapus Data Demo</button>
   <div class="upgrade"><strong>Study smarter.</strong>
    <p>Rencanakan pekerjaan akademikmu dengan lebih terarah bersama Studia.</p>
    <span class="pill">STUDENT EDITION</span>
@@ -64,6 +63,12 @@ HTML = r"""
    <button class="btn primary" onclick="openTask()">＋ Tambah Tugas</button>
   </header>
 
+  <section class="demo-banner" id="demoBanner" aria-label="Mode data demo" hidden>
+   <span class="pill gray">DATA DEMO</span>
+   <span>Contoh tugas terpisah dari data pribadimu dan hanya tersimpan di browser ini.</span>
+   <button class="btn small" id="removeDemoBannerBtn">Hapus Data Demo</button>
+  </section>
+
   <section class="card onboarding-card" id="onboardingChecklist" aria-labelledby="onboardingTitle" hidden>
    <div class="card-head">
     <div><div class="eyebrow">MULAI DENGAN LANGKAH SEDERHANA</div><h2 id="onboardingTitle">Mulai dari Sini</h2><div class="sub" id="onboardingSummary">Kenali ruang kerja dan siapkan rencana kuliahmu.</div></div>
@@ -87,7 +92,7 @@ HTML = r"""
   <div class="dashboard-grid">
    <div class="left-stack">
     <section class="card activity-card">
-     <div class="card-head"><div><h2>Kalender tenggat</h2><div class="sub">Jumlah deadline terjadwal · 28 hari terakhir</div></div><span class="pill">JADWAL</span></div>
+     <div class="card-head"><div><h2>Aktivitas deadline</h2><div class="sub">Jumlah deadline terjadwal · 28 hari terakhir</div></div><span class="pill">28 HARI</span></div>
      <div class="activity-grid" id="activityGrid" aria-label="Aktivitas deadline selama empat minggu terakhir"></div>
      <div class="heat-legend"><span>4 minggu lalu</span><span id="activitySummary">0 deadline tercatat</span><span>Hari ini</span><span class="heat-legend-scale"><span>Rendah</span><i class="heat-cell"></i><i class="heat-cell level-1"></i><i class="heat-cell level-2"></i><i class="heat-cell level-3"></i><i class="heat-cell level-4"></i><span>Tinggi</span></span></div>
     </section>
@@ -130,8 +135,9 @@ HTML = r"""
    <div class="right-stack">
     <section class="card calendar">
      <div class="cal-head"><button class="icon-btn" id="prevMonth" aria-label="Bulan sebelumnya">‹</button><strong id="monthLabel"></strong><button class="icon-btn" id="nextMonth" aria-label="Bulan berikutnya">›</button></div>
-     <div class="weekdays"><div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div></div>
+     <div class="weekdays"><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div><div>Min</div></div>
      <div class="days" id="calendarDays"></div>
+     <div class="calendar-legend"><span><i class="calendar-dot"></i>Ada deadline</span><span><i class="calendar-dot completed"></i>Tugas selesai</span></div>
      <div class="agenda">
       <div class="card-head"><div><h2 id="agendaTitle">Agenda</h2><div class="sub" id="agendaSub">Pilih tanggal untuk melihat tugas.</div></div><button class="btn small" onclick="navigate('schedule')">View all</button></div>
       <div id="agendaList"></div>
@@ -176,7 +182,7 @@ HTML = r"""
  <section class="view" id="view-schedule">
   <header class="heading"><div><div class="eyebrow">TIME MANAGEMENT</div><h1>Schedule & Agenda</h1><div class="muted">Lihat tugas berdasarkan tanggal deadline.</div></div><button class="btn primary" onclick="openTask()">＋ Tambah Tugas</button></header>
   <div class="dashboard-grid">
-   <section class="card calendar"><div class="cal-head"><button class="icon-btn" id="prevMonth2">‹</button><strong id="monthLabel2"></strong><button class="icon-btn" id="nextMonth2">›</button></div><div class="weekdays"><div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div></div><div class="days" id="calendarDays2"></div></section>
+   <section class="card calendar"><div class="cal-head"><button class="icon-btn" id="prevMonth2" aria-label="Bulan sebelumnya">‹</button><strong id="monthLabel2"></strong><button class="icon-btn" id="nextMonth2" aria-label="Bulan berikutnya">›</button></div><div class="weekdays"><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div><div>Min</div></div><div class="days" id="calendarDays2"></div><div class="calendar-legend"><span><i class="calendar-dot"></i>Ada deadline</span><span><i class="calendar-dot completed"></i>Tugas selesai</span></div></section>
    <section class="card"><h2 id="scheduleDateTitle">Agenda</h2><div class="sub">Agenda pada tanggal yang dipilih.</div><div id="scheduleList" style="margin-top:15px"></div></section>
   </div>
  </section>
@@ -190,11 +196,6 @@ HTML = r"""
    <div class="card"><div class="stat-label">Estimasi Aktif</div><div class="stat-number" id="mHours">0h</div></div>
   </div>
   <section class="card" style="margin-top:15px"><h2>Progress Summary</h2><div class="sub">Persentase dihitung otomatis dari status tugas.</div><div id="monitorBars" style="margin-top:20px"></div></section>
- </section>
-
- <section class="view" id="view-classroom">
-  <header class="heading"><div><div class="eyebrow">COURSE MANAGEMENT</div><h1>Classroom</h1><div class="muted">Daftar mata kuliah dari tugas yang sudah kamu masukkan.</div></div><button class="btn primary" onclick="openTask()">＋ Tambah Tugas</button></header>
-  <div id="classroomList" class="stats"></div>
  </section>
 
  <section class="view" id="view-messages">
@@ -213,7 +214,7 @@ HTML = r"""
    <article class="card tutorial-guide"><span class="pill">TUGAS</span><h2>Buat tugas dan deadline</h2><ol><li>Buka My Tasks atau tekan Tambah Tugas.</li><li>Isi nama tugas, mata kuliah, dan deadline.</li><li>Pilih kepentingan dan estimasi, lalu simpan.</li></ol><p class="sub">Prioritas diurutkan dari deadline, kepentingan, dan estimasi. Tugas tersimpan lokal pada browser ini.</p><button class="btn small" onclick="navigate('tasks');openTask()">Buat tugas</button></article>
    <article class="card tutorial-guide"><span class="pill">JADWAL</span><h2>Periksa kalender</h2><p class="sub">Schedule menampilkan kalender dan tugas menurut tanggal deadline. Pilih hari untuk melihat agenda; kalender dashboard memakai data tugas yang sama.</p><button class="btn small" onclick="navigate('schedule')">Buka Schedule</button></article>
    <article class="card tutorial-guide"><span class="pill">PROGRES</span><h2>Pantau progres</h2><p class="sub">Monitoring merangkum status aktual tugas. Tandai tugas selesai dari daftar atau agenda; grafik aktivitas hanya mencatat penyelesaian yang terjadi setelah riwayat mulai direkam.</p><button class="btn small" onclick="navigate('monitoring')">Buka Monitoring</button></article>
-   <article class="card tutorial-guide"><span class="pill">MATA KULIAH</span><h2>Classroom</h2><p class="sub">Halaman ini mengelompokkan tugas berdasarkan nama mata kuliah yang kamu masukkan. Ini bukan ruang kelas daring dan tidak mengelola peserta atau materi kuliah.</p><button class="btn small" onclick="navigate('classroom')">Buka Classroom</button></article>
+   <article class="card tutorial-guide"><span class="pill">DATA DEMO</span><h2>Mode presentasi</h2><p class="sub">Muat Data Demo untuk menampilkan tugas contoh yang ditandai jelas dan disimpan terpisah dari tugas pribadimu. Hapus Data Demo kapan saja tanpa menghapus tugas pribadi.</p><button class="btn small" onclick="loadDemoData()">Muat Data Demo</button></article>
    <article class="card tutorial-guide"><span class="pill">PENGINGAT</span><h2>Pengingat deadline</h2><p class="sub">Halaman Pengingat menampilkan pemberitahuan dari deadline tugas yang tersimpan. Ini bukan chat, tidak mengirim pesan, dan tidak berjalan saat aplikasi ditutup.</p><button class="btn small" onclick="navigate('messages')">Buka Pengingat</button></article>
    <article class="card tutorial-guide"><span class="pill">FOKUS & DATA</span><h2>Belajar dan simpan data</h2><p class="sub">Focus Timer dapat dikaitkan dengan tugas dan menyimpan sesi di browser. My Tasks menyediakan ekspor CSV serta cadangan/pemulihan JSON agar data bisa kamu pindahkan secara manual.</p><button class="btn small" onclick="navigate('dashboard');document.getElementById('focusTimerCard').scrollIntoView({behavior:'smooth',block:'center'})">Lihat Focus Timer</button></article>
   </div>
@@ -271,7 +272,7 @@ HTML = r"""
 <div class="toast" id="toast" role="status" aria-live="polite"><span class="toast-mark" id="toastMark">✓</span><span id="toastMessage"></span></div>
 
 
-<script src="static/studia.js?v=6" defer></script>
+<script src="static/studia.js?v=7" defer></script>
 </body>
 </html>
 """

@@ -172,7 +172,12 @@ h3{font-size:14px;margin:0}
 .day.today:not(.selected){border:1px solid var(--purple)}
 .day.event:after{content:"";position:absolute;bottom:4px;left:calc(50% - 2px);
  width:4px;height:4px;border-radius:50%;background:var(--green)}
+.day.completed-event:after{background:#a9a2bb}
 .day.selected.event:after{background:#21172f}
+.calendar-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;color:var(--muted);font-size:10px}
+.calendar-legend span{display:flex;align-items:center;gap:6px}
+.calendar-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.calendar-dot.completed{background:#a9a2bb}
 .agenda{margin-top:21px}
 .agenda-item{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
 .agenda-item:last-child{border-bottom:0}
@@ -238,6 +243,9 @@ h3{font-size:14px;margin:0}
 .focus-history-item span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .export-btn{white-space:nowrap}
 .onboarding-card{margin:0 0 15px;background:linear-gradient(135deg,#302b3d,#272431);border-color:#66527f}
+.demo-banner{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 15px;padding:11px 14px;border:1px solid #6b5882;border-radius:12px;background:#302b3d;color:#d4c9e7;font-size:11px}
+.demo-banner>span:nth-child(2){flex:1;min-width:180px}
+.demo-banner[hidden]{display:none}
 .onboarding-actions{display:flex;align-items:center;gap:8px}
 .onboarding-steps{list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:0;padding:0}
 .onboarding-step{display:flex;align-items:center;gap:10px;min-width:0;padding:10px 12px;border:1px solid #ffffff14;border-radius:12px;background:#ffffff06}

@@ -15,7 +15,8 @@ selesai di tab **Actions**.
 ## Fitur
 
 - Dashboard progres dengan ringkasan tugas, aktivitas tenggat, dan grafik.
-- Kalender, agenda per tanggal, dan daftar mata kuliah.
+- Kalender deadline Senin–Minggu dengan agenda tanggal, nama hari, status, dan
+  prioritas tugas.
 - Tambah, edit, hapus, cari, filter, urutkan, dan ekspor tugas ke CSV.
 - Cadangan dan pemulihan data lokal dalam format JSON.
 - Focus Timer Pomodoro dengan sesi istirahat, riwayat, dan atribusi tugas.
@@ -24,12 +25,16 @@ selesai di tab **Actions**.
   Tutorial permanen.
 - Pengingat deadline di dalam aplikasi saat halaman dibuka dan toast status.
 - Layout responsif untuk layar komputer dan ponsel.
+- Data Demo akademik yang ditandai jelas, tersimpan terpisah, dan dapat dihapus
+  tanpa mengubah tugas pribadi.
 
 Riwayat aktivitas baru mulai direkam setelah versi yang mendukungnya digunakan.
 Tugas lama tetap dimuat, tetapi tidak dipakai untuk merekonstruksi grafik historis.
 Pengingat bukan browser notification dan tidak berjalan saat website ditutup.
-Classroom mengelompokkan tugas berdasarkan mata kuliah, sedangkan Pengingat
-menampilkan peringatan deadline; keduanya bukan ruang kelas daring atau chat.
+Tugas demo tidak dicampur ke penyimpanan tugas pribadi; ekspor cadangan hanya
+memuat data pribadi, sementara CSV menandai sumber setiap tugas.
+Untuk presentasi, pilih **Muat Data Demo** dari sidebar atau Tutorial; saat aktif,
+banner Data Demo menyediakan **Hapus Data Demo** tanpa mengubah tugas pribadi.
 Sound effect berdiri sendiri telah dihapus. Intro berlangsung setelah pengguna
 membuka Studia, tanpa autoplay audio.
 
