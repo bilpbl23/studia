@@ -1,0 +1,48 @@
+{
+  "format": "studia-backup",
+  "version": 1,
+  "exportedAt": "2026-10-14T12:00:00.000Z",
+  "tasks": [
+    {
+      "id": "backup-task",
+      "title": "Tugas cadangan",
+      "subject": "Pengujian",
+      "deadline": "2026-10-20T10:00",
+      "importance": "high",
+      "duration": 60,
+      "description": "Fixture pemulihan",
+      "done": true,
+      "createdAt": "2026-10-14T11:00:00.000Z",
+      "updatedAt": "2026-10-14T11:30:00.000Z",
+      "completedAt": "2026-10-14T11:30:00.000Z",
+      "isSample": false
+    }
+  ],
+  "activityEvents": [
+    {
+      "id": "backup-event",
+      "type": "completed",
+      "at": "2026-10-14T11:30:00.000Z",
+      "taskId": "backup-task",
+      "taskTitle": "Tugas cadangan"
+    }
+  ],
+  "focusSessions": [
+    {
+      "id": "backup-session",
+      "at": "2026-10-14T11:45:00.000Z",
+      "minutes": 25,
+      "task": "Tugas cadangan",
+      "taskId": "backup-task"
+    }
+  ],
+  "focusTimer": {
+    "duration": 1500,
+    "remaining": 1500,
+    "endAt": null,
+    "taskId": "backup-task",
+    "mode": "focus",
+    "sessionId": null
+  },
+  "soundEnabled": false
+}

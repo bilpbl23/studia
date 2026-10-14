@@ -2,7 +2,7 @@
 
 Dashboard akademik untuk mengatur tugas kuliah, tenggat waktu, agenda, dan sesi
 belajar. Studia berjalan seluruhnya di browser; data tugas dan preferensi disimpan
-di local storage masing-masing pengguna.
+di penyimpanan lokal browser dan tidak tersinkron otomatis antarperangkat.
 
 ## Buka Studia
 
@@ -17,9 +17,27 @@ selesai di tab **Actions**.
 - Dashboard progres dengan ringkasan tugas, aktivitas tenggat, dan grafik.
 - Kalender, agenda per tanggal, dan daftar mata kuliah.
 - Tambah, edit, hapus, cari, filter, urutkan, dan ekspor tugas ke CSV.
-- Focus Timer Pomodoro dengan sesi istirahat dan riwayat waktu fokus.
-- Pengingat popup, toast, serta efek suara yang bisa dinyalakan atau dimatikan.
+- Cadangan dan pemulihan data lokal dalam format JSON.
+- Focus Timer Pomodoro dengan sesi istirahat, riwayat, dan atribusi tugas.
+- Grafik penyelesaian berbasis riwayat perubahan status yang benar-benar tercatat.
+- Pengingat di dalam aplikasi saat halaman dibuka, toast, dan efek suara opsional.
 - Layout responsif untuk layar komputer dan ponsel.
+
+Riwayat aktivitas baru mulai direkam setelah versi yang mendukungnya digunakan.
+Tugas lama tetap dimuat, tetapi tidak dipakai untuk merekonstruksi grafik historis.
+Pengingat bukan browser notification dan tidak berjalan saat website ditutup.
+
+## Pengembangan dan pemeriksaan
+
+Source frontend berada di `static/studia.css` dan `static/studia.js`; Flask
+menyajikan file tersebut untuk penggunaan lokal. Workflow Pages menyalin aset yang
+sama bersama `index.html` ke `_site/`.
+
+Jalankan pemeriksaan:
+
+```powershell
+python -m unittest discover -s tests -v
+```
 
 ## Jalankan secara lokal (opsional)
 

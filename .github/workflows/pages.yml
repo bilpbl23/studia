@@ -26,10 +26,13 @@ jobs:
           python-version: "3.12"
       - name: Install app dependencies
         run: python -m pip install -r requirements.txt
+      - name: Run application checks
+        run: python -m unittest discover -s tests -v
       - name: Build static website
         run: |
-          mkdir -p _site
+          mkdir -p _site/static
           python -c "from pathlib import Path; from studia import HTML; Path('_site/index.html').write_text(HTML, encoding='utf-8')"
+          cp -R static/. _site/static/
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

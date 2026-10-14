@@ -12,257 +12,7 @@ HTML = r"""
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Studia | Academic Workspace</title>
-<style>
-:root{
- --bg:#393943;--side:#211f2b;--panel:#24222f;--panel2:#2d2a3a;
- --line:#403c50;--purple:#b38aff;--purple2:#8e63e9;
- --text:#f5f0ff;--muted:#a9a2bb;--green:#71e0bd;--mint:#b9f2df;
- --red:#ff827f;--yellow:#f4d37d;
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);
- font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:14px;
- background-image:radial-gradient(ellipse at 80% 0%,#6b4e8c33,transparent 38%)}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-button:focus-visible,input:focus-visible,select:focus-visible{
- outline:2px solid var(--purple);outline-offset:2px}
-.app{max-width:1600px;margin:auto;min-height:100vh;display:grid;
- grid-template-columns:235px minmax(0,1fr);gap:18px;padding:18px}
-.sidebar{background:var(--side);border:1px solid var(--line);
- border-radius:22px;padding:23px 15px;display:flex;flex-direction:column;
- min-height:calc(100vh - 36px);box-shadow:0 18px 50px #17141f55}
-.brand{font-size:27px;font-weight:850;letter-spacing:-1.5px;
- padding:0 10px 28px}
-.brand span{color:var(--purple)}
-.brand small{display:block;color:var(--muted);font-size:10px;
- letter-spacing:2px;margin-top:4px;font-weight:500}
-.nav-label{font-size:10px;letter-spacing:1.5px;color:#817b92;
- padding:15px 11px 8px}
-.nav{display:flex;align-items:center;gap:12px;width:100%;padding:12px;
- color:#c9c3d6;background:transparent;border:0;border-radius:10px;
- text-align:left;margin:2px 0}
-.nav:hover,.nav.active{background:#393544;color:white}
-.nav.active{box-shadow:inset 3px 0 var(--purple)}
-.nav .ico{width:19px;text-align:center;font-size:17px}
-.nav .count{margin-left:auto;color:var(--purple);font-size:11px}
-.sidebar-bottom{margin-top:auto}
-.upgrade{margin-top:20px;padding:16px;border-radius:15px;
- background:linear-gradient(145deg,#51406d,#30283f);border:1px solid #62507e}
-.upgrade strong{display:block;margin-bottom:7px}
-.upgrade p{font-size:11px;line-height:1.6;color:#d1c5e5}
-.main{min-width:0;padding:4px 3px}
-.topbar{display:flex;align-items:center;gap:15px;margin:4px 0 27px}
-.search{flex:1;position:relative}
-.search input{padding-left:38px}
-.search:before{content:"⌕";position:absolute;left:13px;top:7px;
- font-size:23px;color:var(--muted)}
-input,select,textarea{background:#211f2b;border:1px solid var(--line);
- color:var(--text);padding:11px 12px;border-radius:10px;width:100%;min-width:0}
-input::placeholder,textarea::placeholder{color:#837d94}
-.top-actions{display:flex;align-items:center;gap:10px}
-.icon-btn{width:39px;height:39px;border:1px solid var(--line);
- border-radius:11px;background:var(--panel);color:var(--text)}
-.notification-trigger{position:relative}
-.notification-dot{position:absolute;top:7px;right:7px;width:8px;height:8px;
- border-radius:50%;background:#ff827f;border:1px solid var(--panel);display:none}
-.notification-dot.active{display:block}
-.sound-toggle.muted{color:var(--muted);opacity:.72}
-.avatar{width:38px;height:38px;border-radius:50%;background:#bda0ff;
- color:#292034;display:grid;place-items:center;font-weight:850}
-.heading{display:flex;justify-content:space-between;align-items:flex-end;
- gap:12px;margin-bottom:23px}
-.eyebrow{color:var(--purple);font-size:10px;letter-spacing:2px;font-weight:800}
-h1{font-size:clamp(25px,3vw,35px);letter-spacing:-1.3px;margin:7px 0}
-h2{font-size:17px;margin:0}
-h3{font-size:14px;margin:0}
-.muted{color:var(--muted)}
-.sub{font-size:12px;line-height:1.7;color:var(--muted);margin-top:7px}
-.btn{border:1px solid var(--line);border-radius:10px;padding:10px 13px;
- color:var(--text);background:var(--panel2)}
-.btn.primary{background:var(--purple);color:#21172f;border-color:var(--purple);font-weight:800}
-.btn:hover{filter:brightness(1.1)}
-.btn.small{font-size:11px;padding:7px 9px}
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
-.card{background:var(--panel);border:1px solid var(--line);
- border-radius:17px;padding:18px;min-width:0;box-shadow:0 10px 28px #17141f22;
- transition:transform .2s,border-color .2s,box-shadow .2s}
-.card:hover{border-color:#635579;box-shadow:0 14px 32px #17141f38}
-.stats>.card:nth-child(1){background:linear-gradient(145deg,#ffd09c,#f7ad74);color:#2b211e;border-color:#f4bb91}
-.stats>.card:nth-child(1) .stat-label,.stats>.card:nth-child(1) .stat-foot{color:#644b42}
-.stats>.card:nth-child(1) .stat-icon{background:#f29b5b;color:white}
-.stats>.card:nth-child(1) .trend{color:#a8582f}
-.stats>.card:nth-child(2){background:linear-gradient(145deg,#c8f1df,#91ddc3);color:#172b28;border-color:#a6e9d2}
-.stats>.card:nth-child(2) .stat-label,.stats>.card:nth-child(2) .stat-foot{color:#42675e}
-.stats>.card:nth-child(2) .stat-icon{background:#36a889;color:white}
-.stats>.card:nth-child(2) .trend{color:#18775f}
-.stats>.card:nth-child(3){background:linear-gradient(145deg,#d4c0ff,#ac8af0);color:#261e35;border-color:#c3a7ff}
-.stats>.card:nth-child(3) .stat-label,.stats>.card:nth-child(3) .stat-foot{color:#55466f}
-.stats>.card:nth-child(3) .stat-icon{background:#8664ce;color:white}
-.stats>.card:nth-child(3) .trend{color:#6243a5}
-.stats>.card:nth-child(4){background:linear-gradient(145deg,#f4b5b9,#df8796);color:#321d26;border-color:#eca2ac}
-.stats>.card:nth-child(4) .stat-label,.stats>.card:nth-child(4) .stat-foot{color:#74434f}
-.stats>.card:nth-child(4) .stat-icon{background:#bc5b72;color:white}
-.stats>.card:nth-child(4) .trend{color:#87394f}
-.stat-top{display:flex;justify-content:space-between;align-items:center;gap:6px}
-.stat-icon{width:34px;height:34px;display:grid;place-items:center;
- border-radius:10px;background:#49395f;color:#d8c2ff;font-size:17px}
-.trend{font-size:10px;color:var(--green)}
-.stat-label{font-size:12px;color:#c0b9d0;margin-top:14px}
-.stat-number{font-size:31px;font-weight:800;letter-spacing:-1px;margin-top:4px}
-.stat-foot{font-size:10px;color:var(--muted);margin-top:6px}
-.dashboard-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(285px,.85fr);
- gap:15px;margin-top:15px;align-items:start}
-.left-stack,.right-stack{display:grid;gap:15px;min-width:0}
-.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px}
-.legend{font-size:11px;color:var(--muted)}
-.legend span{color:var(--purple)}
-.chart-wrap{width:100%;height:170px}
-.chart-wrap svg{width:100%;height:100%;overflow:visible}
-.activity-card{background:linear-gradient(145deg,#262330,#30283e);border-color:#51445f}
-.activity-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px;margin:17px 0 10px}
-.heat-cell{aspect-ratio:1;border:1px solid #ffffff0c;border-radius:6px;background:#454151;
- transition:transform .15s,filter .15s}
-.heat-cell:hover{transform:scale(1.14);filter:brightness(1.2)}
-.heat-cell.level-1{background:#634b7c}
-.heat-cell.level-2{background:#8763ad}
-.heat-cell.level-3{background:#a47ad0}
-.heat-cell.level-4{background:#c2a1f1}
-.heat-legend{display:flex;align-items:center;justify-content:space-between;gap:10px;
- color:var(--muted);font-size:10px}
-.heat-legend-scale{display:flex;align-items:center;gap:4px}
-.heat-legend-scale .heat-cell{width:11px;height:11px;aspect-ratio:auto;cursor:default}
-.chart-labels{display:flex;justify-content:space-between;color:var(--muted);font-size:10px;margin-top:8px}
-.metric-row{display:flex;justify-content:space-between;gap:12px;margin:12px 0 6px;font-size:12px}
-.progress{height:6px;border-radius:20px;background:#3c3949;overflow:hidden}
-.progress div{height:100%;background:var(--purple);border-radius:20px;transition:width .2s}
-.assignments{display:grid;gap:0}
-.assignment{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(85px,.8fr) auto;
- gap:10px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
-.assignment:last-child{border-bottom:0}
-.assignment-name{font-size:12px;font-weight:750;overflow-wrap:anywhere}
-.assignment-sub{font-size:10px;color:var(--muted);margin-top:5px}
-.assignment-date{font-size:10px;color:#d0c9dc;line-height:1.7}
-.pill{display:inline-block;padding:5px 8px;border-radius:8px;
- font-size:9px;font-weight:800;white-space:nowrap;background:#49395f;color:#d6c1ff}
-.pill.green{background:#21483f;color:#8ce9ca}
-.pill.red{background:#512f38;color:#ffaaa9}
-.pill.yellow{background:#4c432c;color:#f4d88c}
-.pill.gray{background:#383544;color:#bcb5cd}
-.calendar{background:#302d3d;border-color:#51465f}
-.cal-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:17px}
-.cal-head strong{font-size:14px}
-.cal-nav{display:flex;gap:5px}
-.cal-nav button{width:29px;height:29px;border:0;border-radius:8px;background:#443c55;color:white}
-.cal-nav button:hover{background:var(--purple);color:#21172f}
-.weekdays,.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
-.weekdays div{text-align:center;font-size:10px;color:var(--muted);padding:7px 0}
-.day{position:relative;aspect-ratio:1;border:0;border-radius:8px;background:transparent;
- color:#e5deef;font-size:11px}
-.day:hover{background:#4b435c}
-.day.selected{background:var(--purple);color:#21172f;font-weight:850}
-.day.today:not(.selected){border:1px solid var(--purple)}
-.day.event:after{content:"";position:absolute;bottom:4px;left:calc(50% - 2px);
- width:4px;height:4px;border-radius:50%;background:var(--green)}
-.day.selected.event:after{background:#21172f}
-.agenda{margin-top:21px}
-.agenda-item{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
-.agenda-item:last-child{border-bottom:0}
-.check{width:18px;height:18px;accent-color:var(--purple);flex-shrink:0;margin-top:2px}
-.agenda-content{flex:1;min-width:0}
-.agenda-title{font-size:12px;font-weight:700;overflow-wrap:anywhere}
-.agenda-meta{font-size:10px;color:var(--muted);margin-top:5px;line-height:1.6}
-.agenda-time{font-size:10px;color:#c8bddb;white-space:nowrap}
-.section-tools{display:flex;gap:8px;margin-bottom:14px}
-.section-tools input{flex:1}
-.section-tools select{width:auto;max-width:150px}
-.task-row{padding:14px 0;border-bottom:1px solid var(--line)}
-.task-row:last-child{border-bottom:0}
-.task-row-top{display:flex;align-items:flex-start;gap:10px}
-.task-row-info{flex:1;min-width:0}
-.task-row-title{font-size:13px;font-weight:750;overflow-wrap:anywhere}
-.task-row-meta{font-size:11px;color:var(--muted);line-height:1.8;margin-top:6px}
-.task-row-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
-.task-row.done .task-row-title{text-decoration:line-through;color:var(--muted)}
-.focus-card{background:linear-gradient(140deg,#40334f,#24222f);border-color:#65527f}
-.focus-title{font-size:20px;font-weight:800;margin:12px 0 7px;overflow-wrap:anywhere}
-.reason{border-left:2px solid var(--purple);background:#322b40;
- padding:11px;font-size:12px;line-height:1.7;margin:15px 0}
-.empty{text-align:center;color:var(--muted);font-size:12px;padding:24px 8px;line-height:1.8}
-.view{display:none}
-.view.active{display:block}
-.modal{display:none;position:fixed;inset:0;background:#100d18c9;z-index:20;
- align-items:center;justify-content:center;padding:15px}
-.modal.open{display:flex}
-.modal-box{width:min(520px,100%);max-height:90vh;overflow-y:auto;
- background:var(--side);border:1px solid var(--line);padding:23px;border-radius:18px}
-.modal-box.popup-box{width:min(440px,100%);animation:popup-in .2s ease-out}
-.popup-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.popup-list{margin-top:12px}
-.popup-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
-.toast{position:fixed;right:24px;bottom:24px;z-index:40;display:flex;align-items:center;
- gap:11px;width:min(370px,calc(100vw - 32px));padding:14px 16px;border-radius:14px;
- background:#292633;border:1px solid #66527f;box-shadow:0 18px 50px #0007;
- opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity .2s,transform .2s}
-.toast.show{opacity:1;transform:translateY(0)}
-.toast-mark{width:30px;height:30px;display:grid;place-items:center;flex-shrink:0;
- border-radius:9px;background:#48385e;color:#d8c2ff}
-.toast.success .toast-mark{background:#21483f;color:#8ce9ca}
-.toast.warning .toast-mark{background:#4c432c;color:#f4d88c}
-.focus-timer{background:linear-gradient(145deg,#242330,#30283e);border-color:#51445f}
-.timer-layout{display:flex;align-items:center;gap:18px}
-.timer-ring{--timer-progress:0deg;width:112px;height:112px;border-radius:50%;
- flex:0 0 112px;display:grid;place-items:center;
- background:conic-gradient(var(--purple) var(--timer-progress),#464151 var(--timer-progress))}
-.focus-timer.break-mode .timer-ring{background:conic-gradient(var(--green) var(--timer-progress),#464151 var(--timer-progress))}
-.timer-face{width:94px;height:94px;border-radius:50%;display:grid;place-items:center;
- align-content:center;gap:2px;background:#25232f}
-.timer-time{font-size:25px;font-weight:850;letter-spacing:-1px;font-variant-numeric:tabular-nums}
-.timer-caption{font-size:9px;color:var(--muted);letter-spacing:1px}
-.timer-controls{display:flex;gap:7px;margin-top:10px}
-.timer-controls .btn{min-width:74px}
-.timer-options{display:grid;grid-template-columns:1fr;gap:9px;flex:1;min-width:0}
-.timer-summary{display:flex;justify-content:space-between;gap:12px;margin-top:15px;
- padding-top:13px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}
-.timer-summary strong{color:var(--text)}
-.export-btn{white-space:nowrap}
-@keyframes popup-in{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.field{display:flex;flex-direction:column;gap:7px;margin-bottom:13px}
-.field label{font-size:11px;color:var(--muted)}
-.full{grid-column:1/-1}
-.form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
-.error{color:var(--red);font-size:11px;min-height:15px}
-.mobile-menu{display:none}
-footer{text-align:center;color:var(--muted);font-size:10px;padding:24px 0}
-@media(max-width:1050px){
- .app{grid-template-columns:190px minmax(0,1fr);gap:12px;padding:12px}
- .dashboard-grid{grid-template-columns:1fr}
- .right-stack{grid-template-columns:1fr 1fr;align-items:start}
-}
-@media(max-width:700px){
- .app{display:block;padding:12px}
- .sidebar{display:none;min-height:0;margin-bottom:12px}
- .sidebar.open{display:flex}
- .mobile-menu{display:inline-block}
- .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
- .card{padding:14px}
- .heading{align-items:flex-start;flex-direction:column}
- .right-stack{grid-template-columns:1fr}
- .topbar{margin-bottom:20px}
- .assignment{grid-template-columns:minmax(0,1fr) auto;gap:8px}
- .assignment-date{grid-column:1}
- .assignment>.pill{grid-column:2;grid-row:1}
- .toast{right:16px;bottom:16px}
-}
-@media(max-width:420px){
- .form-grid{grid-template-columns:1fr}
- .full{grid-column:auto}
- .stat-number{font-size:27px}
- .section-tools{flex-wrap:wrap}
- .section-tools select{width:100%;max-width:none}
-}
-</style>
+<link rel="stylesheet" href="static/studia.css?v=2">
 </head>
 <body>
 <div class="app">
@@ -277,7 +27,7 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:24px 0}
  <button class="nav" data-view="classroom"><span class="ico">▣</span>Classroom</button>
  <button class="nav" data-view="messages"><span class="ico">✉</span>Messages</button>
  <div class="sidebar-bottom">
-  <button class="nav" id="sampleBtn"><span class="ico">↻</span>Reset Sample Data</button>
+  <button class="nav" id="sampleBtn"><span class="ico">✦</span>Muat data contoh</button>
   <div class="upgrade"><strong>Study smarter.</strong>
    <p>Rencanakan pekerjaan akademikmu dengan lebih terarah bersama Studia.</p>
    <span class="pill">STUDENT EDITION</span>
@@ -286,6 +36,13 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:24px 0}
 </aside>
 
 <main class="main">
+ <div class="storage-notice" id="storageNotice" role="alert">
+  <p id="storageNoticeText"></p>
+  <div class="task-row-actions">
+   <button class="btn small" id="downloadRecoveryBtn" hidden>Unduh salinan</button>
+   <button class="btn small" id="resetStorageBtn" hidden>Mulai baru</button>
+  </div>
+ </div>
  <div class="topbar">
   <button class="icon-btn mobile-menu" id="menuBtn" aria-label="Menu">☰</button>
   <div class="search"><input id="globalSearch" placeholder="Cari tugas atau mata kuliah..." aria-label="Cari tugas"></div>
@@ -314,32 +71,38 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:24px 0}
    <div class="card"><div class="stat-top"><span class="stat-icon">◷</span><span class="trend">DEADLINE</span></div><div class="stat-label">Overdue Tasks</div><div class="stat-number" id="lateStat">0</div><div class="stat-foot">Melewati batas waktu</div></div>
   </div>
 
+  <section class="today-brief" aria-label="Ringkasan hari ini">
+   <article class="today-panel"><h2>Tenggat hari ini <span class="pill" id="todayCount">0</span></h2><div class="sub" id="todayTasksIntro">Belum ada tugas dengan tenggat hari ini.</div><div class="today-list" id="todayTasksList"></div></article>
+   <article class="today-panel"><h2>Prioritas berikutnya</h2><div class="sub" id="nextDeadlineIntro">Tambahkan tugas untuk melihat tenggat terdekat.</div><div class="today-list" id="nextDeadlineList"></div></article>
+  </section>
+
   <div class="dashboard-grid">
    <div class="left-stack">
     <section class="card activity-card">
-     <div class="card-head"><div><h2>Weekly Engagement</h2><div class="sub">Aktivitas deadline · 28 hari terakhir</div></div><span class="pill">LIVE DATA</span></div>
+     <div class="card-head"><div><h2>Kalender tenggat</h2><div class="sub">Jumlah deadline terjadwal · 28 hari terakhir</div></div><span class="pill">JADWAL</span></div>
      <div class="activity-grid" id="activityGrid" aria-label="Aktivitas deadline selama empat minggu terakhir"></div>
      <div class="heat-legend"><span>4 minggu lalu</span><span id="activitySummary">0 deadline tercatat</span><span>Hari ini</span><span class="heat-legend-scale"><span>Rendah</span><i class="heat-cell"></i><i class="heat-cell level-1"></i><i class="heat-cell level-2"></i><i class="heat-cell level-3"></i><i class="heat-cell level-4"></i><span>Tinggi</span></span></div>
     </section>
     <section class="card">
-     <div class="card-head"><div><h2>Academic Performance</h2><div class="sub">Perkembangan penyelesaian tugas</div></div><span class="pill">LIVE DATA</span></div>
-     <div class="chart-wrap">
+     <div class="card-head"><div><h2>Aktivitas penyelesaian</h2><div class="sub">Tugas yang ditandai selesai · 28 hari terakhir</div></div><span class="pill">RIWAYAT</span></div>
+     <div class="chart-wrap is-empty" id="completionChart">
       <svg viewBox="0 0 600 180" preserveAspectRatio="none" role="img" aria-label="Grafik progres tugas">
        <g stroke="#403c50" stroke-width="1">
         <line x1="35" y1="20" x2="590" y2="20"/><line x1="35" y1="60" x2="590" y2="60"/>
         <line x1="35" y1="100" x2="590" y2="100"/><line x1="35" y1="140" x2="590" y2="140"/>
        </g>
        <g fill="#a9a2bb" font-size="10">
-        <text x="2" y="23">100</text><text x="9" y="63">70</text>
-        <text x="9" y="103">40</text><text x="15" y="143">0</text>
+        <text id="chartMax" x="2" y="23">0</text><text id="chartMid" x="9" y="83">0</text>
+        <text x="15" y="143">0</text>
        </g>
        <path id="chartArea" d="" fill="#b38aff" opacity=".10"/>
        <path id="chartLine" d="" fill="none" stroke="#b38aff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
        <g id="chartDots"></g>
       </svg>
+      <div class="chart-empty">Riwayat penyelesaian mulai tercatat setelah perubahan ini.<br>Tugas lama tidak digunakan untuk membuat data historis palsu.</div>
      </div>
-     <div class="chart-labels"><span>Awal</span><span>Perkembangan</span><span>Sekarang</span></div>
-     <div class="metric-row"><span class="muted">Overall completion</span><strong id="chartRate">0%</strong></div>
+     <div class="chart-labels"><span>28 hari lalu</span><span>14 hari lalu</span><span>Hari ini</span></div>
+     <div class="metric-row"><span class="muted">Tingkat penyelesaian saat ini</span><strong id="chartRate">0%</strong></div>
      <div class="progress"><div id="chartProgress" style="width:0%"></div></div>
     </section>
 
@@ -388,6 +151,7 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:24px 0}
       </div>
      </div>
      <div class="timer-summary"><span>Total waktu fokus</span><strong id="focusTotal">0 menit · 0 sesi</strong></div>
+     <div class="focus-history" id="focusHistory" aria-label="Sesi fokus terbaru"></div>
     </section>
    </div>
   </div>
@@ -396,7 +160,7 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:24px 0}
  <section class="view" id="view-tasks">
   <header class="heading"><div><div class="eyebrow">TASK MANAGEMENT</div><h1>My Tasks</h1><div class="muted">Kelola tugas, deadline, dan prioritas.</div></div><button class="btn primary" onclick="openTask()">＋ Tambah Tugas</button></header>
   <section class="card">
-   <div class="section-tools"><input id="taskSearch" placeholder="Cari tugas..." oninput="renderTasks()"><select id="taskFilter" onchange="renderTasks()" aria-label="Filter status tugas"><option value="all">Semua status</option><option value="pending">Pending</option><option value="completed">Selesai</option><option value="overdue">Terlambat</option></select><select id="taskSort" onchange="renderTasks()" aria-label="Urutkan tugas"><option value="priority">Prioritas</option><option value="deadline">Deadline terdekat</option><option value="title">Nama tugas</option></select><button class="btn small export-btn" id="exportTasksBtn">↓ Ekspor CSV</button></div>
+   <div class="section-tools"><input id="taskSearch" placeholder="Cari tugas..." oninput="renderTasks()"><select id="taskFilter" onchange="renderTasks()" aria-label="Filter status tugas"><option value="all">Semua status</option><option value="pending">Pending</option><option value="completed">Selesai</option><option value="overdue">Terlambat</option></select><select id="taskSort" onchange="renderTasks()" aria-label="Urutkan tugas"><option value="priority">Prioritas</option><option value="deadline">Deadline terdekat</option><option value="title">Nama tugas</option></select><button class="btn small export-btn" id="exportTasksBtn">↓ Ekspor CSV</button><button class="btn small export-btn" id="exportBackupBtn">↓ Cadangkan JSON</button><button class="btn small export-btn" id="importBackupBtn">↑ Pulihkan JSON</button><input id="backupFile" type="file" accept="application/json,.json" hidden></div>
    <div id="fullTaskList"></div>
   </section>
  </section>
@@ -456,426 +220,15 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:24px 0}
 <div class="modal" id="notificationModal" onclick="if(event.target===this)closeNotifications()">
  <section class="modal-box popup-box" role="dialog" aria-modal="true" aria-labelledby="notificationTitle">
   <div class="popup-head"><div><div class="eyebrow">STUDIA INBOX</div><h2 id="notificationTitle" style="margin-top:7px">Notifikasi</h2></div><button class="icon-btn" id="closeNotificationsBtn" aria-label="Tutup notifikasi">×</button></div>
-  <div class="sub">Pengingat deadline dari tugas yang tersimpan.</div>
+  <div class="sub">Pengingat hanya ditampilkan saat Studia dibuka; tidak ada notifikasi latar belakang.</div>
   <div class="popup-list" id="notificationList"></div>
   <div class="popup-actions"><button class="btn" onclick="closeNotifications()">Tutup</button><button class="btn primary" id="allMessagesBtn">Lihat semua pesan</button></div>
  </section>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"><span class="toast-mark" id="toastMark">✓</span><span id="toastMessage"></span></div>
 
-<script>
-const KEY="studia_tasks_v1";
-const SOUND_KEY="studia_sound_enabled_v1";
-const TIMER_KEY="studia_focus_timer_v1";
-const STUDY_KEY="studia_focus_sessions_v1";
-let tasks=[];
-let soundEnabled=true;
-try{soundEnabled=localStorage.getItem(SOUND_KEY)!=="false"}catch(e){console.error("Sound preference unavailable",e)}
-let audioContext=null;
-let toastTimer=null;
-let focusTimer={duration:25*60,remaining:25*60,endAt:null,taskId:"",mode:"focus"};
-let focusSessions=[];
-let timerInterval=null;
-let selectedDate=new Date();
-let shownMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);
-const $=id=>document.getElementById(id);
-const months=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2)}
-function localDate(d){return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16)}
-function dayKey(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
-function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(tasks))}catch(e){console.error("Storage unavailable",e)}}
-function showToast(message,type="success"){
- const toast=$("toast");
- toast.className="toast show "+type;
- $("toastMessage").textContent=message;
- $("toastMark").textContent=type==="warning"?"!":"✓";
- window.clearTimeout(toastTimer);
- toastTimer=window.setTimeout(()=>toast.classList.remove("show"),3200);
-}
-function playSound(kind="tap"){
- if(!soundEnabled)return;
- try{
-  const AudioContextClass=window.AudioContext||window.webkitAudioContext;
-  if(!AudioContextClass){console.warn("Web Audio is not supported in this browser");return}
-  audioContext=audioContext||new AudioContextClass();
-  if(audioContext.state==="suspended")audioContext.resume().catch(e=>console.error("Audio playback unavailable",e));
-  const notes=kind==="success"?[660,880]:kind==="warning"?[440,330]:[520];
-  notes.forEach((frequency,index)=>{
-   const start=audioContext.currentTime+index*.11;
-   const oscillator=audioContext.createOscillator(),gain=audioContext.createGain();
-   oscillator.type="sine";oscillator.frequency.setValueAtTime(frequency,start);
-   gain.gain.setValueAtTime(.0001,start);gain.gain.exponentialRampToValueAtTime(.07,start+.015);
-   gain.gain.exponentialRampToValueAtTime(.0001,start+.13);
-   oscillator.connect(gain);gain.connect(audioContext.destination);
-   oscillator.start(start);oscillator.stop(start+.14);
-  });
- }catch(e){console.error("Could not play sound effect",e)}
-}
-function syncSoundButton(){
- const button=$("soundToggle");
- button.classList.toggle("muted",!soundEnabled);
- button.textContent=soundEnabled?"♫":"♪";
- button.title=soundEnabled?"Matikan efek suara":"Aktifkan efek suara";
- button.setAttribute("aria-label",button.title);
- button.setAttribute("aria-pressed",String(soundEnabled));
-}
-function loadFocusData(){
- try{
-  const savedTimer=localStorage.getItem(TIMER_KEY);
-  if(savedTimer){
-   const parsed=JSON.parse(savedTimer);
-   const duration=Number(parsed.duration),remaining=Number(parsed.remaining),mode=parsed.mode==="break"?"break":"focus";
-   if(([15,25,45,60].includes(duration/60)||(mode==="break"&&duration===300))&&Number.isFinite(remaining)&&remaining>=0){
-    focusTimer={duration,remaining,endAt:Number.isFinite(Number(parsed.endAt))&&parsed.endAt?Number(parsed.endAt):null,taskId:typeof parsed.taskId==="string"?parsed.taskId:"",mode};
-    if(focusTimer.endAt)focusTimer.remaining=Math.max(0,Math.ceil((focusTimer.endAt-Date.now())/1000));
-   }
-  }
- }catch(e){console.error("Could not restore focus timer",e)}
- try{
-  const raw=localStorage.getItem(STUDY_KEY),parsed=raw?JSON.parse(raw):[];
-  focusSessions=Array.isArray(parsed)?parsed.filter(s=>s&&Number.isFinite(Number(s.minutes))&&typeof s.at==="string").slice(-500):[];
- }catch(e){console.error("Could not restore focus history",e)}
-}
-function saveFocusData(){
- try{
-  localStorage.setItem(TIMER_KEY,JSON.stringify(focusTimer));
-  localStorage.setItem(STUDY_KEY,JSON.stringify(focusSessions.slice(-500)));
- }catch(e){console.error("Could not save focus data",e)}
-}
-function renderFocusTimer(){
- const total=focusTimer.duration,remaining=Math.max(0,focusTimer.remaining);
- const minutes=String(Math.floor(remaining/60)).padStart(2,"0"),seconds=String(remaining%60).padStart(2,"0");
- $("timerDisplay").textContent=minutes+":"+seconds;
- $("timerRing").style.setProperty("--timer-progress",(total?Math.min(1,(total-remaining)/total):0)*360+"deg");
- $("focusTimerCard").classList.toggle("break-mode",focusTimer.mode==="break");
- $("timerCaption").textContent=focusTimer.endAt?(focusTimer.mode==="break"?"ISTIRAHAT BERJALAN":"SEDANG FOKUS"):focusTimer.mode==="break"?"SIAP ISTIRAHAT":remaining===0?"SESI SELESAI":"SIAP FOKUS";
- $("timerStartBtn").textContent=focusTimer.endAt?"Jeda":focusTimer.mode==="break"?"Mulai istirahat":"Mulai fokus";
- $("timerResetBtn").textContent=focusTimer.mode==="break"?"Kembali ke fokus":"Atur ulang";
- $("timerDuration").disabled=Boolean(focusTimer.endAt)||focusTimer.mode==="break";
- $("timerTask").disabled=Boolean(focusTimer.endAt)||focusTimer.mode==="break";
- const previousTask=focusTimer.taskId;
- $("timerTask").innerHTML='<option value="">Sesi belajar bebas</option>'+sorted().filter(task=>!task.done).map(task=>`<option value="${esc(task.id)}">${esc(task.title)} · ${esc(task.subject)}</option>`).join("");
- const sessionCount=focusSessions.length,totalMinutes=focusSessions.reduce((sum,session)=>sum+Number(session.minutes),0);
- $("focusTotal").textContent=totalMinutes.toLocaleString("id-ID")+" menit · "+sessionCount+" sesi";
- $("timerTask").value=previousTask&&tasks.some(task=>task.id===previousTask&&!task.done)?previousTask:"";
-}
-function updateFocusTick(){
- if(!focusTimer.endAt)return;
- focusTimer.remaining=Math.max(0,Math.ceil((focusTimer.endAt-Date.now())/1000));
- renderFocusTimer();
- if(focusTimer.remaining===0)completeFocusSession();
-}
-function startOrPauseFocus(){
- if(focusTimer.endAt){
-  focusTimer.remaining=Math.max(0,Math.ceil((focusTimer.endAt-Date.now())/1000));
-  focusTimer.endAt=null;
-  window.clearInterval(timerInterval);timerInterval=null;
-  saveFocusData();renderFocusTimer();playSound("tap");return;
- }
- if(focusTimer.remaining===0)focusTimer.remaining=focusTimer.duration;
- focusTimer.taskId=$("timerTask").value;
- focusTimer.endAt=Date.now()+focusTimer.remaining*1000;
- saveFocusData();renderFocusTimer();playSound("tap");
- timerInterval=window.setInterval(updateFocusTick,250);
-}
-function resetFocusTimer(){
- window.clearInterval(timerInterval);timerInterval=null;
- focusTimer.mode="focus";
- focusTimer.duration=Number($("timerDuration").value)*60;
- focusTimer.remaining=focusTimer.duration;focusTimer.endAt=null;
- focusTimer.taskId=$("timerTask").value;
- saveFocusData();renderFocusTimer();playSound("tap");
-}
-function completeFocusSession(){
- window.clearInterval(timerInterval);timerInterval=null;
- if(focusTimer.mode==="break"){
-  focusTimer.mode="focus";focusTimer.duration=Number($("timerDuration").value)*60;
-  focusTimer.remaining=focusTimer.duration;focusTimer.endAt=null;
-  saveFocusData();renderFocusTimer();
-  showToast("Waktu istirahat selesai. Siap fokus lagi?");playSound("success");
-  return;
- }
- const task=tasks.find(item=>item.id===focusTimer.taskId);
- focusSessions.push({at:new Date().toISOString(),minutes:focusTimer.duration/60,task:task?task.title:""});
- focusTimer.mode="break";focusTimer.duration=5*60;focusTimer.remaining=focusTimer.duration;focusTimer.endAt=null;
- saveFocusData();renderFocusTimer();renderDashboard();
- showToast(task?"Sesi fokus selesai untuk "+task.title+". Mulai istirahat 5 menit?":"Sesi fokus selesai. Mulai istirahat 5 menit?","success");
- playSound("success");
-}
-function load(){
- try{
-  const raw=localStorage.getItem(KEY);
-  if(raw!==null){
-   const data=JSON.parse(raw);
-   tasks=Array.isArray(data)?data.filter(t=>t&&typeof t.id==="string"&&typeof t.title==="string"&&typeof t.subject==="string"&&typeof t.deadline==="string"):[];
-  }else resetSamples(false);
- }catch(e){tasks=[]}
-}
-function resetSamples(ask=true){
- if(ask&&!confirm("Reset semua tugas dan buat ulang contoh data?"))return;
- const now=new Date();
- const plus=(n)=>new Date(now.getTime()+n*86400000);
- tasks=[
-  {id:uid(),title:"Menyelesaikan latihan Python",subject:"Algoritma dan Pemrograman",deadline:localDate(plus(1)),importance:"high",duration:90,description:"Latihan dasar pemrograman",done:false},
-  {id:uid(),title:"Review materi perkuliahan",subject:"Bahasa Inggris",deadline:localDate(plus(2)),importance:"medium",duration:45,description:"Persiapan kelas",done:false},
-  {id:uid(),title:"Membuat laporan praktikum",subject:"Teknologi Rekayasa Otomasi",deadline:localDate(plus(4)),importance:"high",duration:120,description:"Susun laporan dan kesimpulan",done:false},
-  {id:uid(),title:"Membaca modul minggu ini",subject:"Matematika Teknik",deadline:localDate(plus(6)),importance:"low",duration:30,description:"Review konsep dasar",done:false}
- ];
- save();renderAll();
- if(ask){showToast("Contoh tugas berhasil dimuat ulang");playSound("success")}
-}
-function isLate(t){return !t.done&&new Date(t.deadline).getTime()<Date.now()}
-function score(t){
- if(t.done)return -Infinity;
- const h=(new Date(t.deadline).getTime()-Date.now())/3600000;
- const urgency=h<0?50:h<=24?40:h<=72?25:h<=168?15:5;
- const imp={high:30,medium:20,low:10}[t.importance]||10;
- const quick=Math.max(0,10-Math.floor(Math.max(1,Number(t.duration)||1)/30));
- return urgency+imp+quick;
-}
-function sorted(){return [...tasks].sort((a,b)=>a.done!==b.done?(a.done?1:-1):(score(b)-score(a)||new Date(a.deadline)-new Date(b.deadline)))}
-function fmt(v){
- const d=new Date(v);return isNaN(d)?"Tanggal tidak valid":d.toLocaleString("id-ID",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})
-}
-function reason(t){
- const h=(new Date(t.deadline)-Date.now())/3600000;
- let r=h<0?"Deadline sudah terlewat dan perlu segera ditangani.":h<=24?"Deadline kurang dari 24 jam lagi.":h<=72?"Deadline tinggal beberapa hari.":"Kerjakan lebih awal agar tidak menumpuk.";
- if(t.importance==="high")r+=" Kepentingannya tinggi.";
- if(Number(t.duration)<=30)r+=" Durasi relatif singkat.";
- return r;
-}
-function badge(t){
- if(t.done)return ["SELESAI","green"];
- if(isLate(t))return ["TERLAMBAT","red"];
- const s=score(t);return s>=65?["PRIORITAS TINGGI","red"]:s>=40?["SEDANG","yellow"]:["RENDAH","gray"];
-}
-function toggleDone(id){
- const task=tasks.find(t=>t.id===id);
- if(!task)return;
- task.done=!task.done;save();renderAll();
- showToast(task.done?"Tugas selesai. Kerja bagus!":"Tugas dibuka kembali",task.done?"success":"");
- playSound(task.done?"success":"tap");
-}
-function removeTask(id){
- const t=tasks.find(x=>x.id===id);
- if(t&&confirm('Hapus tugas "'+t.title+'"?')){tasks=tasks.filter(x=>x.id!==id);save();renderAll();showToast("Tugas berhasil dihapus","warning");playSound("warning")}
-}
-function openTask(t=null){
- playSound("tap");
- $("taskForm").reset();$("formError").textContent="";$("taskId").value=t?t.id:"";
- $("formTitle").textContent=t?"Edit Tugas":"Tambah Tugas";
- if(t){
-  $("title").value=t.title;$("subject").value=t.subject;$("deadline").value=t.deadline;
-  $("importance").value=t.importance;$("duration").value=t.duration;$("description").value=t.description||"";
- }else{
-  $("importance").value="medium";$("duration").value=60;
-  $("deadline").value=localDate(new Date(Date.now()+86400000));
- }
- $("taskModal").classList.add("open");$("title").focus();
-}
-function closeTask(){$("taskModal").classList.remove("open")}
-function editTask(id){const t=tasks.find(x=>x.id===id);if(t)openTask(t)}
-$("taskForm").addEventListener("submit",e=>{
- e.preventDefault();
- const id=$("taskId").value,title=$("title").value.trim(),subject=$("subject").value.trim();
- const deadline=$("deadline").value,importance=$("importance").value;
- const duration=Number($("duration").value),description=$("description").value.trim();
- if(!title||!subject||!deadline||isNaN(new Date(deadline).getTime())||!Number.isFinite(duration)||duration<1||duration>10080){
-  $("formError").textContent="Periksa kembali nama tugas, mata kuliah, deadline, dan durasi.";return;
- }
- const old=tasks.find(t=>t.id===id);
- const item={id:id||uid(),title,subject,deadline,importance,duration,description,done:old?old.done:false};
- tasks=id?tasks.map(t=>t.id===id?item:t):[...tasks,item];
- save();closeTask();renderAll();showToast(id?"Tugas berhasil diperbarui":"Tugas baru berhasil ditambahkan");playSound("success");
-});
-function taskCard(t){
- const b=badge(t);
- return `<article class="task-row ${t.done?"done":""}">
- <div class="task-row-top"><div class="task-row-info">
- <div class="task-row-title">${esc(t.title)}</div>
- <div class="task-row-meta">${esc(t.subject)}<br>Deadline: ${esc(fmt(t.deadline))}<br>Durasi: ${esc(t.duration)} menit · Kepentingan: ${esc(t.importance)}${t.description?"<br>"+esc(t.description):""}</div>
- </div><span class="pill ${b[1]}">${b[0]}</span></div>
- <div class="task-row-actions"><button class="btn small" onclick="toggleDone('${t.id}')">${t.done?"Buka kembali":"✓ Selesai"}</button><button class="btn small" onclick="editTask('${t.id}')">Edit</button><button class="btn small" onclick="removeTask('${t.id}')">Hapus</button></div></article>`;
-}
-function renderTasks(){
- const q=($("taskSearch")?.value||$("globalSearch").value).trim().toLowerCase();
- const filter=$("taskFilter")?.value||"all";
- const sortBy=$("taskSort")?.value||"priority";
- const list=sorted().filter(t=>(t.title+" "+t.subject).toLowerCase().includes(q)&&
- (filter==="all"||(filter==="pending"&&!t.done)||(filter==="completed"&&t.done)||(filter==="overdue"&&isLate(t))));
- if(sortBy==="deadline")list.sort((a,b)=>new Date(a.deadline)-new Date(b.deadline));
- if(sortBy==="title")list.sort((a,b)=>a.title.localeCompare(b.title,"id"));
- $("fullTaskList").innerHTML=list.length?list.map(taskCard).join(""):'<div class="empty">Tidak ada tugas yang sesuai.</div>';
-}
-function exportTasks(){
- const quote=value=>{
-  let text=String(value??"");
-  if(/^[\s]*[=+\-@]/.test(text))text="'"+text;
-  return '"'+text.replace(/"/g,'""')+'"';
- };
- const rows=[["Nama tugas","Mata kuliah","Deadline","Prioritas","Durasi (menit)","Status","Catatan"],
-  ...sorted().map(task=>[task.title,task.subject,fmt(task.deadline),task.importance,task.duration,task.done?"Selesai":isLate(task)?"Terlambat":"Aktif",task.description||""])];
- const csv="\uFEFF"+rows.map(row=>row.map(quote).join(",")).join("\r\n");
- const url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
- const link=document.createElement("a");
- link.href=url;link.download="studia-tugas-"+dayKey(new Date())+".csv";
- document.body.appendChild(link);link.click();link.remove();
- window.setTimeout(()=>URL.revokeObjectURL(url),1000);
- showToast("Laporan tugas berhasil diunduh");playSound("success");
-}
-function renderDashboard(){
- const pending=tasks.filter(t=>!t.done),done=tasks.filter(t=>t.done),late=pending.filter(isLate);
- const rate=tasks.length?Math.round(done.length/tasks.length*100):0;
- $("completionStat").textContent=rate+"%";$("activeStat").textContent=pending.length;
- $("doneStat").textContent=done.length;$("lateStat").textContent=late.length;
- $("navPending").textContent=pending.length;
- $("today").textContent=new Date().toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
- $("chartRate").textContent=rate+"%";$("chartProgress").style.width=rate+"%";
- $("overviewActive").textContent=pending.length;$("overviewDone").textContent=done.length;
- $("activeProgress").style.width=(tasks.length?pending.length/tasks.length*100:0)+"%";
- $("doneProgress").style.width=rate+"%";
- const mins=pending.reduce((s,t)=>s+(Number(t.duration)||0),0);
- $("totalTime").textContent=(mins/60).toLocaleString("id-ID",{maximumFractionDigits:1})+" jam";
- $("studyInsight").textContent=late.length?late.length+" tugas telah melewati deadline. Evaluasi prioritasmu.":pending.length?"Terus kerjakan tugas secara konsisten.":"Semua tugas sudah selesai!";
- const focus=sorted().find(t=>!t.done);
- $("focusContent").innerHTML=focus?`<span class="pill">REKOMENDASI UTAMA</span><div class="focus-title">${esc(focus.title)}</div><div class="muted">${esc(focus.subject)}</div><div class="sub">Deadline: ${esc(fmt(focus.deadline))}<br>Estimasi: ${esc(focus.duration)} menit</div><div class="reason">${esc(reason(focus))}</div><button class="btn primary" onclick="toggleDone('${focus.id}')">✓ Tandai selesai</button> <button class="btn" onclick="editTask('${focus.id}')">Edit</button>`:'<div class="empty">Belum ada tugas aktif. Tambahkan tugas untuk memulai.</div>';
- const recent=sorted().filter(t=>!t.done).slice(0,4);
- $("assignmentList").innerHTML=recent.length?recent.map(t=>{const b=badge(t);return `<div class="assignment"><div><div class="assignment-name">${esc(t.title)}</div><div class="assignment-sub">${esc(t.subject)}</div></div><div class="assignment-date">${esc(fmt(t.deadline))}</div><span class="pill ${b[1]}">${b[0]}</span></div>`}).join(""):'<div class="empty">Belum ada tugas aktif.</div>';
- // Chart is derived from the real overall completion rate.
- const vals=[Math.max(0,rate-35),Math.max(0,rate-20),Math.max(0,rate-12),Math.max(0,rate-5),rate];
- const pts=vals.map((v,i)=>({x:45+i*132,y:140-v*1.15}));
- const line=pts.map((p,i)=>(i?"L":"M")+p.x+" "+p.y).join(" ");
- $("chartLine").setAttribute("d",line);
- $("chartArea").setAttribute("d",line+" L "+pts[pts.length-1].x+" 145 L "+pts[0].x+" 145 Z");
- $("chartDots").innerHTML=pts.map((p,i)=>`<circle cx="${p.x}" cy="${p.y}" r="${i===pts.length-1?5:3}" fill="${i===pts.length-1?"#b38aff":"#777087"}"/>`).join("");
- renderActivity();
-}
-function renderActivity(){
- const today=new Date(),first=new Date(today.getFullYear(),today.getMonth(),today.getDate()-27);
- const dueCounts=new Map();
- tasks.forEach(task=>{
-  const key=task.deadline.slice(0,10);
-  dueCounts.set(key,(dueCounts.get(key)||0)+1);
- });
- let total=0;
- $("activityGrid").innerHTML=Array.from({length:28},(_,index)=>{
-  const date=new Date(first.getFullYear(),first.getMonth(),first.getDate()+index);
-  const key=dayKey(date),count=dueCounts.get(key)||0;
-  total+=count;
-  const level=count>=4?4:count>=3?3:count>=2?2:count?1:0;
-  const label=date.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long"});
-  return `<button class="heat-cell level-${level}" onclick="selectDate('${key}')" title="${esc(label)} · ${count} deadline${count===1?"":"s"}" aria-label="${esc(label)}: ${count} deadline${count===1?"":"s"}"></button>`;
- }).join("");
- $("activitySummary").textContent=total+" deadline tercatat";
-}
-function renderCalendar(){
- [1,2].forEach(n=>{
-  const label=$("monthLabel"+(n===1?"":"2")),grid=$("calendarDays"+(n===1?"":"2"));
-  label.textContent=months[shownMonth.getMonth()]+" "+shownMonth.getFullYear();
-  const first=new Date(shownMonth.getFullYear(),shownMonth.getMonth(),1);
-  const count=new Date(shownMonth.getFullYear(),shownMonth.getMonth()+1,0).getDate();
-  let html="";
-  for(let i=0;i<first.getDay();i++)html+='<span></span>';
-  for(let d=1;d<=count;d++){
-   const date=new Date(shownMonth.getFullYear(),shownMonth.getMonth(),d);
-   const key=dayKey(date),today=key===dayKey(new Date()),selected=key===dayKey(selectedDate);
-   const event=tasks.some(t=>t.deadline.slice(0,10)===key&&!t.done);
-   html+=`<button class="day ${today?"today":""} ${selected?"selected":""} ${event?"event":""}" onclick="selectDate('${key}')" aria-label="${d} ${months[shownMonth.getMonth()]}">${d}</button>`;
-  }
-  grid.innerHTML=html;
- });
- renderAgenda();
-}
-function selectDate(key){
- const [y,m,d]=key.split("-").map(Number);
- selectedDate=new Date(y,m-1,d);shownMonth=new Date(y,m-1,1);
- renderCalendar();
-}
-function renderAgenda(){
- const key=dayKey(selectedDate);
- const list=tasks.filter(t=>t.deadline.slice(0,10)===key).sort((a,b)=>new Date(a.deadline)-new Date(b.deadline));
- const title=selectedDate.toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"});
- $("agendaTitle").textContent="Agenda";$("agendaSub").textContent=title;
- const html=list.length?list.map(t=>`<div class="agenda-item"><input class="check" type="checkbox" ${t.done?"checked":""} onchange="toggleDone('${t.id}')" aria-label="Tandai selesai"><div class="agenda-content"><div class="agenda-title">${esc(t.title)}</div><div class="agenda-meta">${esc(t.subject)} · ${esc(t.importance)}</div></div><div class="agenda-time">${esc(new Date(t.deadline).toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"}))}</div></div>`).join(""):'<div class="empty">Tidak ada agenda pada tanggal ini.</div>';
- $("agendaList").innerHTML=html;
- $("scheduleDateTitle").textContent=title;$("scheduleList").innerHTML=html;
-}
-function renderMonitoring(){
- const pending=tasks.filter(t=>!t.done),done=tasks.filter(t=>t.done),late=pending.filter(isLate);
- const rate=tasks.length?Math.round(done.length/tasks.length*100):0;
- $("mTotal").textContent=tasks.length;$("mRate").textContent=rate+"%";
- $("mLate").textContent=late.length;
- $("mHours").textContent=(pending.reduce((s,t)=>s+(Number(t.duration)||0),0)/60).toLocaleString("id-ID",{maximumFractionDigits:1})+"h";
- const groups=[["Selesai",done.length],["Belum selesai",pending.length],["Terlambat",late.length]];
- $("monitorBars").innerHTML=groups.map(([name,n])=>`<div class="metric-row"><span>${name}</span><strong>${n}</strong></div><div class="progress" style="margin-bottom:16px"><div style="width:${tasks.length?n/tasks.length*100:0}%"></div></div>`).join("");
-}
-function renderClassroom(){
- const subjects=[...new Set(tasks.map(t=>t.subject))];
- $("classroomList").innerHTML=subjects.length?subjects.map(s=>{
-  const ts=tasks.filter(t=>t.subject===s),d=ts.filter(t=>t.done).length;
-  return `<article class="card"><div class="stat-icon">▣</div><h3 style="margin-top:13px">${esc(s)}</h3><div class="sub">${ts.length} tugas · ${d} selesai</div><div class="progress"><div style="width:${ts.length?d/ts.length*100:0}%"></div></div><button class="btn small" onclick="navigate('tasks');$('taskSearch').value=${JSON.stringify(s)};renderTasks()">Lihat tugas</button></article>`;
- }).join(""):'<div class="card empty">Mata kuliah muncul setelah kamu menambahkan tugas.</div>';
-}
-function renderMessages(){
- const pending=tasks.filter(t=>!t.done);
- const messages=[];
- pending.filter(isLate).forEach(t=>messages.push(["Deadline terlewat",t.title+" — "+t.subject,"red"]));
- pending.filter(t=>!isLate(t)&&(new Date(t.deadline)-Date.now())<=86400000).forEach(t=>messages.push(["Deadline mendekat",t.title+" — "+fmt(t.deadline),"yellow"]));
- const actionable=messages.length;
- if(!actionable)messages.push(["Semua terkendali","Tidak ada peringatan deadline berdasarkan tugas yang tersimpan.","green"]);
- const html=messages.map(m=>`<div class="agenda-item"><span class="pill ${m[2]}">●</span><div class="agenda-content"><div class="agenda-title">${esc(m[0])}</div><div class="agenda-meta">${esc(m[1])}</div></div></div>`).join("");
- $("messageList").innerHTML=html;
- $("notificationList").innerHTML=html;
- $("notificationDot").classList.toggle("active",actionable>0);
-}
-function openNotifications(){
- renderMessages();$("notificationModal").classList.add("open");playSound("tap");
- $("closeNotificationsBtn").focus();
-}
-function closeNotifications(){$("notificationModal").classList.remove("open")}
-function renderAll(){
- renderDashboard();renderTasks();renderCalendar();renderMonitoring();renderClassroom();renderMessages();
- renderFocusTimer();
-}
-function navigate(view){
- document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
- $("view-"+view).classList.add("active");
- document.querySelectorAll(".nav[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===view));
- $("sidebar").classList.remove("open");
- if(view==="tasks")renderTasks();
- window.scrollTo({top:0,behavior:"smooth"});
-}
-document.querySelectorAll(".nav[data-view]").forEach(b=>b.addEventListener("click",()=>navigate(b.dataset.view)));
-$("prevMonth").onclick=$("prevMonth2").onclick=()=>{shownMonth=new Date(shownMonth.getFullYear(),shownMonth.getMonth()-1,1);renderCalendar()};
-$("nextMonth").onclick=$("nextMonth2").onclick=()=>{shownMonth=new Date(shownMonth.getFullYear(),shownMonth.getMonth()+1,1);renderCalendar()};
-$("globalSearch").addEventListener("input",()=>{
- $("taskSearch").value=$("globalSearch").value;
- if($("globalSearch").value.trim())navigate("tasks");
- renderTasks();
-});
-$("menuBtn").onclick=()=>$("sidebar").classList.toggle("open");
-$("sampleBtn").onclick=()=>resetSamples(true);
- $("exportTasksBtn").onclick=exportTasks;
- $("timerStartBtn").onclick=startOrPauseFocus;
- $("timerResetBtn").onclick=resetFocusTimer;
- $("timerDuration").onchange=resetFocusTimer;
- $("timerTask").onchange=()=>{focusTimer.taskId=$("timerTask").value;saveFocusData()};
- $("notificationBtn").onclick=openNotifications;
- $("closeNotificationsBtn").onclick=closeNotifications;
- $("allMessagesBtn").onclick=()=>{closeNotifications();navigate("messages")};
- $("soundToggle").onclick=()=>{
-  soundEnabled=!soundEnabled;
-  try{localStorage.setItem(SOUND_KEY,String(soundEnabled))}catch(e){console.error("Could not save sound preference",e)}
-  syncSoundButton();playSound("tap");
-  showToast(soundEnabled?"Efek suara diaktifkan":"Efek suara dimatikan");
- };
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeTask();closeNotifications()}});
-syncSoundButton();
-load();loadFocusData();renderAll();
-if(focusTimer.endAt){timerInterval=window.setInterval(updateFocusTick,250);updateFocusTick()}
-</script>
+<script src="static/studia.js?v=2" defer></script>
 </body>
 </html>
 """
